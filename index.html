@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SachCheck - Final Fixed</title>
+    <title>SachCheck - Final</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0a192f; color: white; }
         .header { background: #112240; padding: 15px; border-bottom: 1px solid #233554; font-weight: bold; }
         .card { background: #112240; margin: 15px; padding: 20px; border-radius: 12px; border-left: 5px solid #4caf50; }
-        .input-box { width: 100%; background: transparent; border: none; border-bottom: 1px solid #233554; color: white; font-size: 18px; padding: 10px 0; outline: none; }
-        .btn-verify { background: #4caf50; color: white; width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .input-box { width: 100%; background: transparent; border: none; border-bottom: 1px solid #233554; color: white; font-size: 18px; padding: 10px 0; outline: none; margin: 10px 0; }
+        .btn-verify { background: #4caf50; color: white; width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
         
         .news-card { background: #112240; margin: 15px; border-radius: 15px; overflow: hidden; border: 1px solid #233554; }
         .news-img { width: 100%; height: 180px; object-fit: cover; }
 
-        #result-screen { display: none; padding: 15px; }
+        #result-screen, #scan-screen { display: none; padding: 15px; }
         .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
         .ev-link { text-decoration: none; display: block; background: #112240; border-radius: 10px; overflow: hidden; border: 1px solid #233554; }
-        .ev-img { width: 100%; height: 85px; object-fit: cover; }
-        .ev-label { font-size: 10px; padding: 6px; color: #1a73e8; font-weight: bold; text-align: center; }
-        
-        #scan-screen { display: none; text-align: center; padding: 50px; }
+        .ev-img { width: 100%; height: 90px; object-fit: cover; }
+        .ev-label { font-size: 11px; padding: 8px; color: #1a73e8; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body onload="updateNews()">
@@ -29,38 +27,37 @@
 
 <div id="main-ui">
     <div class="card">
-        <div style="color: #4caf50; font-size: 12px; font-weight: bold; margin-bottom: 10px;">📅 दावा जाँचें / Verify a Claim</div>
-        <input type="text" id="userInput" class="input-box" placeholder="Kya Modi ki degree farji hai">
+        <div style="color: #4caf50; font-size: 14px; font-weight: bold;">📅 दावा जाँचें / Verify a Claim</div>
+        <input type="text" id="userInput" class="input-box" placeholder="यहाँ अपना सवाल लिखें...">
         <button class="btn-verify" onclick="startDeepScan()">🛡️ Verify Claim</button>
     </div>
 
-    <div style="padding: 10px 20px; color: #64ffda; font-weight: bold; font-size: 14px;">📰 ताज़ा समाचार / Latest News</div>
-    <div id="news-container">
-        </div>
+    <div style="padding: 10px 20px; color: #64ffda; font-weight: bold;">📰 ताज़ा समाचार / Latest News</div>
+    <div id="news-container"></div>
 </div>
 
-<div id="scan-screen">
-    <img id="active-pic" style="width:150px; height:150px; border-radius:15px; border: 2px solid #64ffda;" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=300">
-    <p id="active-log" style="color:#64ffda; font-family:monospace; margin-top:15px;">AI डेटाबेस खोज रहा है...</p>
+<div id="scan-screen" style="text-align: center; padding-top: 50px;">
+    <h2 style="color: #64ffda;">AI डेटाबेस खोज रहा है...</h2>
+    <p>कृपया प्रतीक्षा करें</p>
 </div>
 
 <div id="result-screen">
-    <div style="background: #1a2a41; padding: 20px; border-radius: 15px; border: 1px solid #233554;">
-        <div style="background: #e74c3c; display: inline-block; padding: 6px 15px; border-radius: 5px; font-weight: bold; font-size: 14px;">🚨 FAKE / MISLEADING</div>
+    <div style="background: #112240; padding: 20 : 15px; border-radius: 15px; border: 1px solid #233554;">
+        <div style="background: #e74c3c; display: inline-block; padding: 5px 12px; border-radius: 5px; font-weight: bold; font-size: 13px;">🚨 FAKE / MISLEADING</div>
         <h2 style="margin: 15px 0 10px 0;">विश्लेषण रिपोर्ट</h2>
-        <p style="font-size: 14px; opacity: 0.8;">जाँच में यह दावा भ्रामक पाया गया। नीचे क्लिक करके सीधे **सबूत वाला पैराग्राफ** देखें।</p>
+        <p style="font-size: 14px; opacity: 0.8;">यह दावा भ्रामक पाया गया है। नीचे दिए गए आधिकारिक स्रोतों में **सबूत (Highlight)** देखें।</p>
         
         <div class="evidence-grid">
             <a href="https://www.thehindu.com/news/national/gujarat-hc-sets-aside-cic-order-to-gu-to-provide-info-on-pm-modis-degree/article66683526.ece#:~:text=Gujarat%20High%20Court%20on%20Friday" target="_blank" class="ev-link">
                 <img class="ev-img" src="https://images.unsplash.com/photo-1585829365234-781fcd50c30b?w=200">
-                <div class="ev-label">The Hindu (पैराग्राफ देखें)</div>
+                <div class="ev-label">The Hindu (सबूत देखें)</div>
             </a>
-            <a href="https://twitter.com/PIBFactCheck#:~:text=verified,information" target="_blank" class="ev-link">
+            <a href="https://twitter.com/PIBFactCheck#:~:text=verified" target="_blank" class="ev-link">
                 <img class="ev-img" src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200">
-                <div class="ev-label">Twitter (सबूत)</div>
+                <div class="ev-label">PIB Check (Twitter)</div>
             </a>
         </div>
-        <button class="btn-verify" style="background:#233554; width:100%; margin-top:25px;" onclick="location.reload()">नई जाँच शुरू करें</button>
+        <button class="btn-verify" style="background:#233554; width:100%; margin-top:20px;" onclick="location.reload()">नई जाँच शुरू करें</button>
     </div>
 </div>
 
@@ -68,32 +65,25 @@
 const allNews = [
     { title: "Intel CEO Lip-Bu Tan: I was shocked to find China's Huawei...", source: "Times of India", img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500" },
     { title: "AI Technology reaches new heights in 2026", source: "TechCrunch", img: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=500" },
-    { title: "Stock market hits record high this Monday", source: "Economic Times", img: "
- { title: "NASA discovers potential signs of water on Mars", source: "National Geographic", img: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=500" },
     { title: "Electric vehicle sales double in last quarter", source: "Reuters", img: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=500" }
 ];
 
 function updateNews() {
     let randomNews = allNews[Math.floor(Math.random() * allNews.length)];
-    let html = `
+    document.getElementById('news-container').innerHTML = `
         <div class="news-card">
             <img class="news-img" src="${randomNews.img}">
             <div style="padding: 15px;">
                 <div style="font-size: 16px; font-weight: bold;">${randomNews.title}</div>
                 <div style="color: #1a73e8; font-size: 12px;">${randomNews.source}</div>
             </div>
-        </div>
-    `;
-    document.getElementById('news-container').innerHTML = html;
+        </div>`;
 }
 
 function startDeepScan() {
-    let input = document.getElementById('userInput').value;
-    if(!input) return alert("कुछ टाइप करें!");
-
+    if(!document.getElementById('userInput').value) return alert("कुछ टाइप करें!");
     document.getElementById('main-ui').style.display = 'none';
     document.getElementById('scan-screen').style.display = 'block';
-
     setTimeout(() => {
         document.getElementById('scan-screen').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
