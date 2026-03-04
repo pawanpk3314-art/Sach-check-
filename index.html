@@ -3,34 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SachCheck</title>
+    <title>SachCheck - Google Lens AI</title>
     <style>
-        body { background-color: #0d1b2a; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .container { width: 100%; max-width: 400px; }
-        header { text-align: center; margin-bottom: 20px; }
-        .card { background: #1b263b; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
-        textarea { width: 100%; height: 100px; background: transparent; border: 1px solid #415a77; color: white; border-radius: 10px; padding: 10px; box-sizing: border-box; }
-        .btn { background: #4caf50; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .news-box { background: #1b263b; border-radius: 15px; padding: 15px; }
+        body { background-color: #0d1b2a; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
+        .card { background: #1b263b; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; }
+        .lens-btn { background: #4285F4; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        input[type="file"] { margin: 10px 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🛡️ SachCheck</h1>
-            <p>AI + Live News • सच की जाँच</p>
-        </header>
-
-        <div class="card">
-            <label>📑 दावा जाँचें / Verify a Claim</label>
-            <textarea placeholder="यहाँ खबर लिखें..."></textarea>
-            <button class="btn">✅ Verify Claim</button>
-        </div>
-
-        <div class="news-box">
-            <h3>📰 ताज़ा समाचार (Latest News)</h3>
-            <p>खबरों की सच्चाई यहाँ दिखेगी...</p>
-        </div>
+    <h2>🛡️ SachCheck</h2>
+    <div class="card">
+        <p>📸 फोटो की सच्चाई जांचें (Google Lens)</p>
+        <input type="file" id="imageInput" accept="image/*">
+        <button class="lens-btn" onclick="searchImage()">🔍 Search with Google Lens</button>
     </div>
+
+    <script>
+        function searchImage() {
+            const input = document.getElementById('imageInput');
+            if (input.files && input.files[0]) {
+                alert("अभी यह फीचर डेवलपमेंट में है। जल्द ही यह फोटो को सीधे Google Lens पर भेजेगा!");
+                // भविष्य में यहाँ API जुड़ेगी
+            } else {
+                alert("कृपया पहले एक फोटो चुनें!");
+            }
+        }
+    </script>
 </body>
 </html>
