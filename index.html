@@ -1,17 +1,102 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SachCheck - Original UI with Links</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0a192f; color: white; }
+        .header { background: #112240; padding: 15px; border-bottom: 1px solid #233554; font-weight: bold; }
+        
+        /* होमपेज कार्ड जैसा पहले था */
+        .card { background: #112240; margin: 15px; padding: 20px; border-radius: 12px; border-left: 5px solid #4caf50; position: relative; }
+        .input-box { width: 100%; background: transparent; border: none; border-bottom: 1px solid #233554; color: white; font-size: 18px; padding: 10px 0; outline: none; }
+        .btn-verify { background: #4caf50; color: white; width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
+
+        /* ताज़ा समाचार सेक्शन */
+        .news-card { background: #112240; margin: 15px; border-radius: 15px; overflow: hidden; border: 1px solid #233554; }
+        .news-img { width: 100%; height: 180px; object-fit: cover; }
+
+        /* रिज़ल्ट और सोर्स सेक्शन */
+        #result-screen { display: none; padding: 15px; }
+        .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .ev-link { text-decoration: none; display: block; background: #112240; border-radius: 10px; overflow: hidden; border: 1px solid #233554; transition: 0.3s; }
+        .ev-link:active { transform: scale(0.95); }
+        .ev-img { width: 100%; height: 85px; object-fit: cover; }
+        .ev-label { font-size: 10px; padding: 6px; color: #1a73e8; font-weight: bold; text-align: center; }
+        
+        #scan-screen { display: none; text-align: center; padding: 50px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="header">🛡️ SachCheck</div>
+
+<div id="main-ui">
+    <div class="card">
+        <div style="color: #4caf50; font-size: 12px; font-weight: bold; margin-bottom: 10px;">📅 दावा जाँचें / Verify a Claim</div>
+        <input type="text" id="userInput" class="input-box" placeholder="Kya Modi ki degree farji hai">
+        <button class="btn-verify" onclick="startDeepScan()">🛡️ Verify Claim</button>
+    </div>
+
+    <div style="padding: 10px 20px; color: #64ffda; font-weight: bold; font-size: 14px;">📰 ताज़ा समाचार / Latest News</div>
+    <div class="news-card">
+        <img class="news-img" src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=500">
+        <div style="padding: 15px;">
+            <div style="font-size: 16px; font-weight: bold;">Intel CEO Lip-Bu Tan: I was shocked to find...</div>
+            <div style="color: #1a73e8; font-size: 12px;">Times of India</div>
+        </div>
+    </div>
+</div>
+
+<div id="scan-screen">
+    <img id="active-pic" style="width:150px; height:150px; border-radius:15px;" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=300">
+    <p id="active-log" style="color:#64ffda; font-family:monospace; margin-top:15px;">खोज जारी है...</p>
+</div>
+
+<div id="result-screen">
+    <div style="background: #1a2a41; padding: 20px; border-radius: 15px; border: 1px solid #233554;">
+        <div style="background: #e74c3c; display: inline-block; padding: 6px 15px; border-radius: 5px; font-weight: bold; font-size: 14px;">🚨 FAKE / MISLEADING</div>
+        <h2 style="margin: 15px 0 10px 0;">विश्लेषण रिपोर्ट</h2>
+        <p style="font-size: 14px; opacity: 0.8; line-height: 1.6;">इंटरनेट पर मौजूद न्यूज़ आर्काइव्स इसे भ्रामक बता रहे हैं। पुष्टि के लिए नीचे दिए गए स्रोतों पर क्लिक करें।</p>
+        
+        <div style="color: #64ffda; font-weight: bold; margin-top: 20px; font-size: 14px;">तथ्यों के स्रोत / Sources of Fact</div>
+        
+        <div class="evidence-grid">
+            <a href="https://timesofindia.indiatimes.com" target="_blank" class="ev-link">
+                <img class="ev-img" src="https://images.unsplash.com/photo-1585829365234-781fcd50c30b?w=200">
+                <div class="ev-label">Times of India (सत्यता जाँचें)</div>
+            </a>
+            <a href="https://twitter.com" target="_blank" class="ev-link">
+                <img class="ev-img" src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200">
+                <div class="ev-label">Twitter Verified Info</div>
+            </a>
+            <a href="https://pib.gov.in" target="_blank" class="ev-link">
+                <img class="ev-img" src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=200">
+                <div class="ev-label">Govt Archive Scan</div>
+            </a>
+            <a href="https://www.google.com/search?q=fact+check" target="_blank" class="ev-link">
+                <img class="ev-img" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200">
+                <div class="ev-label">Fact Check API</div>
+            </a>
+        </div>
+        
+        <button class="btn-verify" style="background:#233554; width:100%;" onclick="location.reload()">नई जाँच शुरू करें</button>
+    </div>
+</div>
+
 <script>
-// 1. वो फोटो और टेक्स्ट जो खोज के दौरान दिखेंगे
 const steps = [
     { img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300", log: "> Google News स्कैन हो रहा है..." },
-    { img: "https://images.unsplash.com/photo-1611605698335-8b1569810432?w=300", log: "> Twitter API चेक हो रहा है..." },
-    { img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=300", log: "> सरकारी रिकॉर्ड्स देखे जा रहे हैं..." }
+    { img: "https://images.unsplash.com/photo-1611605698335-8b1569810432?w=300", log: "> Twitter API डेटा चेक हो रहा है..." }
 ];
 
 function startDeepScan() {
     let input = document.getElementById('userInput').value;
-    if(!input) return alert("पहले कुछ लिखें!");
+    if(!input) return alert("कुछ टाइप करें!");
 
-    // 2. होम स्क्रीन छुपाओ और स्कैनिंग दिखाओ
-    document.getElementById('main-ui').style.display = 'none';
+    document.getElementById('main-ui').classList.add('hidden');
     document.getElementById('scan-screen').style.display = 'block';
 
     let i = 0;
@@ -22,10 +107,12 @@ function startDeepScan() {
             i++;
         } else {
             clearInterval(timer);
-            // 3. अंत में वो रिपोर्ट और छोटे फोटो वाले सबूत दिखाओ
             document.getElementById('scan-screen').style.display = 'none';
             document.getElementById('result-screen').style.display = 'block';
         }
     }, 1200);
 }
 </script>
+
+</body>
+</html>
