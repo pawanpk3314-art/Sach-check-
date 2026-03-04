@@ -69,3 +69,36 @@ const allNews = [
     { title: "Intel CEO Lip-Bu Tan: I was shocked to find China's Huawei...", source: "Times of India", img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500" },
     { title: "AI Technology reaches new heights in 2026", source: "TechCrunch", img: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=500" },
     { title: "Stock market hits record high this Monday", source: "Economic Times", img: "
+ { title: "NASA discovers potential signs of water on Mars", source: "National Geographic", img: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=500" },
+    { title: "Electric vehicle sales double in last quarter", source: "Reuters", img: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=500" }
+];
+
+function updateNews() {
+    let randomNews = allNews[Math.floor(Math.random() * allNews.length)];
+    let html = `
+        <div class="news-card">
+            <img class="news-img" src="${randomNews.img}">
+            <div style="padding: 15px;">
+                <div style="font-size: 16px; font-weight: bold;">${randomNews.title}</div>
+                <div style="color: #1a73e8; font-size: 12px;">${randomNews.source}</div>
+            </div>
+        </div>
+    `;
+    document.getElementById('news-container').innerHTML = html;
+}
+
+function startDeepScan() {
+    let input = document.getElementById('userInput').value;
+    if(!input) return alert("कुछ टाइप करें!");
+
+    document.getElementById('main-ui').style.display = 'none';
+    document.getElementById('scan-screen').style.display = 'block';
+
+    setTimeout(() => {
+        document.getElementById('scan-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+    }, 2000);
+}
+</script>
+</body>
+</html>
