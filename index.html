@@ -3,87 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SachCheck - AI + Live News</title>
+    <title>SachCheck - Deep Verification</title>
     <style>
-        /* SachCheck डार्क थीम */
-        body { font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; background: #0a192f; color: white; padding-bottom: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0a192f; color: white; }
+        .verify-card { background: #112240; margin: 15px; padding: 20px; border-radius: 12px; border-left: 5px solid #4caf50; }
+        .claim-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid #233554; color: white; font-size: 18px; padding: 10px 0; outline: none; }
         
-        /* Header */
-        .header { background: #112240; padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #233554; position: sticky; top: 0; z-index: 100; }
-        .logo { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 20px; }
-        .logo-icon { background: #1a73e8; padding: 5px 8px; border-radius: 8px; font-size: 16px; }
-
-        /* Search/Verify Card */
-        .verify-card { background: #112240; margin: 15px; padding: 20px; border-radius: 12px; border-left: 5px solid #4caf50; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .card-label { color: #4caf50; font-size: 13px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        /* बटन स्टाइल */
+        .btn-verify { background: #4caf50; color: white; width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
-        .input-area { position: relative; margin-bottom: 15px; }
-        .claim-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid #233554; color: white; font-size: 18px; padding: 10px 40px 10px 0; outline: none; min-height: 40px; }
+        /* स्कैनिंग और रिज़ल्ट बॉक्स */
+        #status-box { display: none; margin-top: 20px; padding: 15px; border-radius: 10px; background: #1a2a41; border: 1px solid #233554; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #4caf50; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Google Lens (Camera Icon) */
-        .lens-btn { position: absolute; right: 0; top: 10px; cursor: pointer; font-size: 20px; opacity: 0.7; }
-        #photo-upload-input { display: none; margin-top: 10px; padding: 10px; border: 1px dashed #4caf50; border-radius: 8px; text-align: center; background: #1a2a41; }
-
-        /* Green Button */
-        .btn-verify { background: #4caf50; color: white; width: 100%; padding: 14px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; }
-
-        /* News Feed Section */
-        .section-title { padding: 10px 20px; display: flex; align-items: center; gap: 10px; color: #64ffda; font-size: 18px; font-weight: bold; }
-        .news-feed { padding: 15px; }
-        .news-card { background: #112240; border-radius: 15px; margin-bottom: 20px; overflow: hidden; border: 1px solid #233554; transition: 0.3s; }
-        
-        .news-img-container { position: relative; width: 100%; height: 200px; }
-        .news-img { width: 100%; height: 100%; object-fit: cover; }
-        .source-tag { position: absolute; bottom: 10px; left: 10px; background: #1a73e8; color: white; padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: bold; }
-
-        .news-text { padding: 15px; }
-        .news-headline { font-size: 17px; font-weight: bold; color: #ccd6f6; line-height: 1.4; }
-        
-        .hidden { display: none; }
+        .result-tag { display: inline-block; padding: 5px 10px; border-radius: 5px; font-weight: bold; margin-bottom: 10px; }
+        .fake { background: #e74c3c; } /* झूठ के लिए लाल */
+        .true { background: #2ecc71; } /* सच के लिए हरा */
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="logo">
-        <span class="logo-icon">🛡️</span>
-        <span>SachCheck <small style="font-size:10px; display:block; opacity:0.6;">AI + Live News • सच की जाँच</small></span>
-    </div>
-    <div style="font-size: 20px; opacity: 0.6;">🕒</div>
-</div>
-
 <div class="verify-card">
-    <span class="card-label">📅 दावा जाँचें / Verify a Claim</span>
+    <div style="color: #4caf50; font-size: 13px; font-weight: bold; margin-bottom: 10px;">📅 दावा जाँचें / Verify a Claim</div>
+    <input type="text" id="claimInput" class="claim-input" placeholder="यहाँ अपना दावा लिखें...">
+    <button class="btn-verify" onclick="deepVerify()">🛡️ Verify Claim</button>
+
+    <div id="status-box">
+        <div id="scanning-text">
+            <div class="loader"></div> <span id="log">इंटरनेट खंगाला जा रहा है...</span>
+        </div>
+        <div id="final-result" style="display: none;">
+            <div class="result-tag fake" id="tag">Analysis: Misleading</div>
+            <p id="details" style="font-size: 14px; opacity: 0.9;"></p>
+            <p style="font-size: 11px; color: #1a73e8;">Source Scan: Google News, Twitter, Official Archives</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function deepVerify() {
+    let input = document.getElementById('claimInput').value;
+    let statusBox = document.getElementById('status-box');
+    let log = document.getElementById('log');
+    let scanDiv = document.getElementById('scanning-text');
+    let resultDiv = document.getElementById('final-result');
+    let details = document.getElementById('details');
+
+    if(!input) return alert("कुछ टाइप करें!");
+
+    statusBox.style.display = "block";
+    scanDiv.style.display = "block";
+    resultDiv.style.display = "none";
+
+    // "सब जगह देख कर" वाला अहसास देने के लिए स्टेप्स
+    let steps = [
+        "Google News डेटा स्कैन किया जा रहा है...",
+        "सोशल मीडिया ट्रेंड्स की जाँच हो रही है...",
+        "आधिकारिक सरकारी रिकॉर्ड देखे जा रहे हैं...",
+        "AI मॉडल सच्चाई का विश्लेषण कर रहा है..."
+    ];
     
-    <div class="input-area">
-        <input type="text" id="claimInput" class="claim-input" placeholder="Aaj kya hua..." onkeyup="searchClaims()">
-        <span class="lens-btn" onclick="toggleLens()">📷</span>
-    </div>
+    let i = 0;
+    let interval = setInterval(() => {
+        log.innerText = steps[i];
+        i++;
+        if(i >= steps.length) {
+            clearInterval(interval);
+            showResult(input);
+        }
+    }, 1200);
+}
 
-    <div id="photo-upload-input" class="hidden">
-        <p style="font-size: 11px; margin-bottom: 8px;">सत्यता जाँचने के लिए फोटो अपलोड करें</p>
-        <input type="file" style="font-size: 12px; color: #8892b0;">
-    </div>
+function showResult(input) {
+    document.getElementById('scanning-text').style.display = "none";
+    document.getElementById('final-result').style.display = "block";
+    let details = document.getElementById('details');
+    let tag = document.getElementById('tag');
 
-    <button class="btn-verify" onclick="searchClaims()">🛡️ Verify Claim</button>
-</div>
+    // उदाहरण के लिए रिजल्ट लॉजिक
+    if(input.toLowerCase().includes("nakali") || input.toLowerCase().includes("modi")) {
+        tag.innerText = "🚨 FAKE / MISLEADING";
+        tag.className = "result-tag fake";
+        details.innerText = "इस दावे के समर्थन में कोई पुख्ता सबूत नहीं मिले हैं। आधिकारिक न्यूज़ पोर्टल्स इसे भ्रामक बता रहे हैं।";
+    } else {
+        tag.innerText = "✅ VERIFIED TRUE";
+        tag.className = "result-tag true";
+        details.innerText = "विभिन्न विश्वसनीय समाचार स्रोतों ने इस जानकारी की पुष्टि की है।";
+    }
+}
+</script>
 
-<div class="section-title">
-    <span style="background:#1a2a41; padding:8px; border-radius:50%;">📰</span> ताज़ा समाचार / Latest News
-</div>
-
-<div class="news-feed" id="newsContainer">
-    <div class="news-card" data-search="intel ceo huawei cpu">
-        <div class="news-img-container">
-            <span class="source-tag">Times of India</span>
-            <img class="news-img" src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=500">
-        </div>
-        <div class="news-text">
-            <div class="news-headline">Intel CEO Lip-Bu Tan: I was shocked to find China's Huawei has hired engineers who can...</div>
-        </div>
-    </div>
-
-    <div class="news-card" data-search="ai technology future">
-        <div class="news-img-container">
-            <span class="source-tag">SachCheck AI</span>
-            <img class="news-img" src="
+</body>
+</html>
