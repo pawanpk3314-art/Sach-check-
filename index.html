@@ -3,32 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SachCheck - Google Lens AI</title>
+    <title>SachCheck AI</title>
     <style>
-        body { background-color: #0d1b2a; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
-        .card { background: #1b263b; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; }
-        .lens-btn { background: #4285F4; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; }
-        input[type="file"] { margin: 10px 0; }
+        body { background-color: #0d1b2a; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .container { width: 100%; max-width: 400px; }
+        .card { background: #1b263b; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #415a77; }
+        .verify-btn { background: #1b263b; color: white; border: 1px solid #415a77; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .lens-btn { background: #4285F4; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        textarea { width: 100%; height: 100px; background: transparent; border: none; color: white; outline: none; resize: none; }
+        .tab-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 8px 15px; border-radius: 20px; font-size: 0.8em; border: 1px solid #415a77; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h2>🛡️ SachCheck</h2>
-    <div class="card">
-        <p>📸 फोटो की सच्चाई जांचें (Google Lens)</p>
-        <input type="file" id="imageInput" accept="image/*">
-        <button class="lens-btn" onclick="searchImage()">🔍 Search with Google Lens</button>
-    </div>
+    <div class="container">
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>SachCheck</h2>
+            <div style="background: #1b263b; padding: 10px; border-radius: 50%;">🕒</div>
+        </header>
+        <p style="font-size: 0.8em; color: #8899a6;">AI + Live News • सच की जाँच</p>
 
-    <script>
-        function searchImage() {
-            const input = document.getElementById('imageInput');
-            if (input.files && input.files[0]) {
-                alert("अभी यह फीचर डेवलपमेंट में है। जल्द ही यह फोटो को सीधे Google Lens पर भेजेगा!");
-                // भविष्य में यहाँ API जुड़ेगी
-            } else {
-                alert("कृपया पहले एक फोटो चुनें!");
-            }
-        }
-    </script>
+        <div class="tab-box">
+            <div class="tab" style="color: #4285F4;">🔍 सवाल → ताज़ा समाचार</div>
+            <div class="tab" style="color: #4caf50;">🛡️ दावा → Fact Check</div>
+        </div>
+
+        <div class="card">
+            <h4 style="color: #4caf50; margin-top: 0;">📋 दावा जाँचें / Verify a Claim</h4>
+            <textarea placeholder="सवाल या दावा यहाँ लिखें... जैसे: 'दुबई में क्या हुआ?'"></textarea>
+        </div>
+
+        <div class="card" style="border-style: dashed;">
+            <h4>📸 फोटो की सच्चाई (Google Lens)</h4>
+            <input type="file" id="img" style="font-size: 0.8em; margin-bottom: 10px;">
+            <button class="lens-btn" onclick="window.open('https://lens.google.com/upload')">🔍 Search with Lens</button>
+        </div>
+
+        <button class="verify-btn">🛡️ Verify Claim</button>
+        
+        <p style="font-size: 0.7em; color: #8899a6; text-align: center; margin-top: 20px;">
+            AI + live news. Always verify with multiple sources independently.
+        </p>
+    </div>
 </body>
 </html>
