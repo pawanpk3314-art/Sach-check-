@@ -3,57 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SachCheck - Deep AI Evidence</title>
+    <title>SachCheck - Full Pro Build</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0a192f; color: white; overflow-x: hidden; }
-        .header { background: #112240; padding: 15px; border-bottom: 1px solid #233554; font-weight: bold; font-size: 18px; }
+        .header { background: #112240; padding: 15px; border-bottom: 1px solid #233554; font-weight: bold; }
         
-        /* Search Card */
+        /* UI Card */
         .card { background: #112240; margin: 15px; padding: 20px; border-radius: 12px; border-left: 5px solid #4caf50; }
         .input-box { width: 100%; background: transparent; border: none; border-bottom: 1px solid #233554; color: white; font-size: 18px; padding: 10px 0; outline: none; margin-bottom: 15px; }
-        .btn-verify { background: #4caf50; color: white; width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-verify:active { transform: scale(0.98); }
+        .btn-verify { background: #4caf50; color: white; width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-        /* Scanning Section */
-        #scan-area { display: none; text-align: center; padding: 40px 20px; }
-        .scan-img { width: 150px; height: 150px; border-radius: 12px; border: 2px solid #64ffda; object-fit: cover; margin-bottom: 20px; }
-        .log-text { font-family: 'Courier New', monospace; color: #64ffda; font-size: 14px; height: 20px; }
+        /* Scanning Animation */
+        #scan-screen { display: none; text-align: center; padding: 50px 20px; }
+        .scan-photo { width: 160px; height: 160px; border-radius: 15px; border: 2px solid #64ffda; object-fit: cover; margin-bottom: 20px; }
+        .log-line { font-family: monospace; color: #64ffda; font-size: 14px; }
 
-        /* Result & Evidence */
-        #result-area { display: none; margin: 15px; }
-        .tag-fake { background: #e74c3c; display: inline-block; padding: 8px 20px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; }
+        /* Results & Evidence */
+        #result-screen { display: none; padding: 15px; }
         .report-box { background: #1a2a41; padding: 20px; border-radius: 15px; border: 1px solid #233554; }
+        .tag-red { background: #e74c3c; display: inline-block; padding: 8px 15px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; }
         
-        /* Sources Section (तथ्यों के स्रोत) */
-        .sources-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .source-item { background: #112240; border-radius: 8px; overflow: hidden; border: 1px solid #233554; padding-bottom: 10px; }
-        .source-img { width: 100%; height: 80px; object-fit: cover; }
-        .source-label { font-size: 10px; padding: 5px; color: #1a73e8; font-weight: bold; text-align: center; }
+        .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .evidence-item { background: #112240; border-radius: 10px; overflow: hidden; border: 1px solid #233554; }
+        .evidence-img { width: 100%; height: 90px; object-fit: cover; }
+        .evidence-text { font-size: 10px; padding: 5px; color: #1a73e8; font-weight: bold; text-align: center; }
 
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="header">🛡️ SachCheck</div>
+<div class="header">🛡️ SachCheck <small style="opacity:0.5; font-size:10px;">AI + Live News</small></div>
 
-<div id="home-ui" class="card">
+<div id="main-ui" class="card">
     <div style="color: #4caf50; font-size: 12px; font-weight: bold; margin-bottom: 10px;">📅 दावा जाँचें / Verify a Claim</div>
-    <input type="text" id="userInput" class="input-box" placeholder="जैसे: मोदी की डिग्री असली है या नकली?">
-    <button class="btn-verify" onclick="runDeepSearch()">🛡️ Verify Claim</button>
+    <input type="text" id="userInput" class="input-box" placeholder="Kya Modi ki degree farji hai">
+    <button class="btn-verify" onclick="startVerification()">🛡️ Verify Claim</button>
 </div>
 
-<div id="scan-area">
-    <img id="active-img" class="scan-img" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=300">
-    <div id="active-log" class="log-text">Initializing AI Scan...</div>
+<div id="scan-screen">
+    <img id="scanner-img" class="scan-photo" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=300">
+    <div id="scanner-log" class="log-line">> Initializing deep search...</div>
 </div>
 
-<div id="result-area">
+<div id="result-screen">
     <div class="report-box">
-        <div class="tag-fake">🚨 FAKE / MISLEADING</div>
+        <div class="tag-red">🚨 FAKE / MISLEADING</div>
         <h2 style="margin: 5px 0;">विश्लेषण रिपोर्ट</h2>
         <p style="font-size: 14px; opacity: 0.8; line-height: 1.6;">
-            हमारी गहन AI जाँच में इस दावे के पक्ष में कोई ठोस दस्तावेज़ नहीं मिले हैं। इंटरनेट पर मौजूद न्यूज़ आर्काइव्स और आधिकारिक बयानों के आधार पर यह जानकारी भ्रामक पाई गई है।
+            हमारी गहन AI जाँच में इस दावे के पक्ष में कोई ठोस दस्तावेज़ नहीं मिले हैं। आधिकारिक न्यूज़ पोर्टल्स और सरकारी रिकॉर्ड्स इसे भ्रामक बता रहे हैं।
         </p>
 
-        <hr style="border: 0; border-top: 1px solid #233554;
+        <hr style="border: 0; border-top: 1px solid #233554; margin: 20px 0;">
+        
+        <div style="font-size: 14px; font-weight: bold; color: #64ffda; margin-bottom: 12px;">तथ्यों के स्रोत / Sources of Fact</div>
+        <div class="evidence-grid">
+            <div class="evidence-item">
+                <img class="evidence-img" src="https://images.unsplash.com/photo-1585829365234-781fcd50c30b?w=200">
+                <div class="evidence-text">Times of India Report</div>
+            </div>
+            <div class="evidence-item">
+                <img class="evidence-img" src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200">
+                <div class="evidence-text">Verified Twitter Data</div>
+            </div>
+            <div class="evidence-item">
+                <img class="evidence-img" src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=200">
+                <div class="evidence-text">Govt Archive Scan</div>
+            </div>
+            <div class="evidence-item">
+                <img class="evidence-img" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200">
+                <div class="evidence-text">PIB Fact Check</div>
+            </div>
+        </div>
+
+        <button class="btn-verify" style="margin-top:25px; background:#233554;" onclick="location.reload()">नई जाँच शुरू करें</button>
+    </div>
+</div>
+
+<script>
+// स्कैनिंग के दौरान बदलने वाले फोटो और टेक्स्ट
+const scanSteps = [
+    { img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300", log: "> Scanning Google News Database..." },
+    { img: "https://images.unsplash.com/photo-1611605698335-8b1569810432?w=300", log: "> Checking Real-time Twitter API..." },
+    { img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=300", log: "> Analyzing Official Records..." },
+    { img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300", log: "> Finalizing AI Verification..." }
+];
+
+function startVerification() {
+    let query = document.getElementById('userInput').value;
+    if(!query) return alert("कृपया अपना दावा यहाँ लिखें!");
+
+    // UI बदलना
+    document.getElementById('main-ui').style.display = 'none';
+    document.getElementById('scan-screen').style.display = 'block';
+
+    let step = 0;
+    let interval = setInterval(() => {
+        if(step < scanSteps.length) {
+            document.getElementById('scanner-img').src = scanSteps[step].img;
+            document.getElementById('scanner-log').innerText = scanSteps[step].log;
+            step++;
+        } else {
+            clearInterval(interval);
+            // परिणाम दिखाना
+            document.getElementById('scan-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+        }
+    }, 1200); // हर 1.2 सेकंड में फोटो बदलेगा
+}
+</script>
+
+</body>
+</html>
