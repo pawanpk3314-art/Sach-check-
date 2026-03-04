@@ -1,33 +1,43 @@
-<script>
-    async function verifyClaim() {
-        const claim = document.querySelector('textarea').value;
-        const btn = document.querySelector('.verify-btn');
-        
-        if (!claim) {
-            alert("कृपया पहले कोई खबर या दावा लिखें!");
-            return;
-        }
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SachCheck AI</title>
+    <style>
+        body { background-color: #0d1b2a; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .container { width: 100%; max-width: 400px; }
+        .card { background: #1b263b; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #415a77; }
+        .verify-btn { background: #1b263b; color: white; border: 1px solid #415a77; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .lens-btn { background: #4285F4; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        textarea { width: 100%; height: 100px; background: transparent; border: none; color: white; outline: none; resize: none; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🛡️ SachCheck</h2>
+        <div class="card">
+            <h4>📋 दावा जाँचें / Verify Claim</h4>
+            <textarea id="claimInput" placeholder="यहाँ खबर लिखें..."></textarea>
+        </div>
+        <div class="card">
+            <h4>📸 फोटो की सच्चाई</h4>
+            <button class="lens-btn" onclick="window.open('https://lens.google.com/upload')">🔍 Google Lens</button>
+        </div>
+        <button class="verify-btn" onclick="verifyClaim()">🛡️ Verify with AI</button>
+    </div>
 
-        btn.innerText = "🔄 AI जाँच कर रहा है...";
-        btn.style.opacity = "0.7";
-
-        // यहाँ हम Gemini AI की ताक़त जोड़ रहे हैं
-        try {
-            // यह हिस्सा आपके दावे को Google Search और AI के साथ कनेक्ट करेगा
+    <script>
+        async function verifyClaim() {
+            const claim = document.getElementById('claimInput').value;
+            const btn = document.querySelector('.verify-btn');
+            if (!claim) { alert("कृपया पहले कुछ लिखें!"); return; }
+            btn.innerText = "🔄 AI जाँच कर रहा है...";
             setTimeout(() => {
-                const searchUrl = `https://www.google.com/search?q=fact+check+${encodeURIComponent(claim)}`;
-                alert("SachCheck AI: हम इस खबर की पुष्टि इंटरनेट पर मौजूद विश्वसनीय स्रोतों से कर रहे हैं।");
-                window.open(searchUrl, '_blank');
-                
-                btn.innerText = "🛡️ Verify Claim";
-                btn.style.opacity = "1";
-            }, 1500);
-        } catch (error) {
-            alert("माफी चाहते हैं, AI अभी व्यस्त है।");
-            btn.innerText = "🛡️ Verify Claim";
+                window.open(`https://www.google.com/search?q=fact+check+${encodeURIComponent(claim)}`);
+                btn.innerText = "🛡️ Verify with AI";
+            }, 1000);
         }
-    }
-
-    // बटन पर क्लिक फंक्शन जोड़ना
-    document.querySelector('.verify-btn').onclick = verifyClaim;
-</script>
+    </script>
+</body>
+</html>
