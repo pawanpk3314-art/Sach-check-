@@ -1,114 +1,16 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SachCheck - Final Evidence Build</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0a192f; color: white; overflow-x: hidden; }
-        .header { background: #112240; padding: 15px; border-bottom: 1px solid #233554; font-weight: bold; display: flex; align-items: center; gap: 10px; }
-        
-        /* Search Card */
-        .card { background: #112240; margin: 15px; padding: 20px; border-radius: 12px; border-left: 5px solid #4caf50; }
-        .input-box { width: 100%; background: transparent; border: none; border-bottom: 1px solid #233554; color: white; font-size: 18px; padding: 10px 0; outline: none; margin-bottom: 15px; }
-        .btn-verify { background: #4caf50; color: white; width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; display: flex; justify-content: center; align-items: center; gap: 8px; }
-
-        /* Scanning Section */
-        #scan-screen { display: none; text-align: center; padding: 40px 20px; }
-        .scan-photo { width: 140px; height: 140px; border-radius: 15px; border: 2px solid #64ffda; object-fit: cover; margin-bottom: 15px; }
-        .log-text { font-family: monospace; color: #64ffda; font-size: 13px; }
-
-        /* Result Dashboard */
-        #result-screen { display: none; padding: 15px; }
-        .report-box { background: #1a2a41; padding: 20px; border-radius: 15px; border: 1px solid #233554; }
-        .tag-fake { background: #e74c3c; display: inline-block; padding: 6px 15px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; font-size: 14px; }
-        
-        /* Evidence Grid (तथ्यों के स्रोत) */
-        .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-        .ev-item { background: #112240; border-radius: 10px; overflow: hidden; border: 1px solid #233554; }
-        .ev-img { width: 100%; height: 85px; object-fit: cover; }
-        .ev-label { font-size: 10px; padding: 6px; color: #1a73e8; font-weight: bold; text-align: center; background: rgba(0,0,0,0.3); }
-
-        /* Latest News */
-        .news-section { margin-top: 20px; }
-        .news-card { background: #112240; margin: 15px; border-radius: 15px; overflow: hidden; border: 1px solid #233554; }
-        .news-img { width: 100%; height: 180px; object-fit: cover; }
-    </style>
-</head>
-<body>
-
-<div class="header">🛡️ SachCheck</div>
-
-<div id="main-ui">
-    <div class="card">
-        <div style="color: #4caf50; font-size: 12px; font-weight: bold; margin-bottom: 10px;">📅 दावा जाँचें / Verify a Claim</div>
-        <input type="text" id="userInput" class="input-box" placeholder="Kya Modi ki degree farji hai">
-        <button class="btn-verify" onclick="startDeepScan()">🛡️ Verify Claim</button>
-    </div>
-
-    <div class="news-section">
-        <div style="padding: 0 20px; color: #64ffda; font-weight: bold; font-size: 14px;">📰 ताज़ा समाचार / Latest News</div>
-        <div class="news-card">
-            <img class="news-img" src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=500">
-            <div style="padding: 15px;">
-                <div style="font-size: 16px; font-weight: bold;">Intel CEO Lip-Bu Tan: I was shocked to find...</div>
-                <div style="color: #1a73e8; font-size: 12px; margin-top: 5px;">Times of India</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="scan-screen">
-    <img id="active-pic" class="scan-photo" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=300">
-    <div id="active-log" class="log-text">खोज शुरू हो रही है...</div>
-</div>
-
-<div id="result-screen">
-    <div class="report-box">
-        <div class="tag-fake">🚨 FAKE / MISLEADING</div>
-        <h2 style="margin: 0 0 10px 0;">विश्लेषण रिपोर्ट</h2>
-        <p style="font-size: 14px; opacity: 0.8; line-height: 1.6;">
-            हमारी गहन AI जाँच में इस दावे के पक्ष में कोई ठोस दस्तावेज़ नहीं मिले हैं। इंटरनेट पर मौजूद न्यूज़ आर्काइव्स इसे भ्रामक बता रहे हैं।
-        </p>
-
-        <hr style="border: 0; border-top: 1px solid #233554; margin: 20px 0;">
-        
-        <div style="font-size: 13px; font-weight: bold; color: #64ffda; margin-bottom: 10px;">तथ्यों के स्रोत / Sources of Fact</div>
-        <div class="evidence-grid">
-            <div class="ev-item">
-                <img class="ev-img" src="https://images.unsplash.com/photo-1585829365234-781fcd50c30b?w=200">
-                <div class="ev-label">Times of India</div>
-            </div>
-            <div class="ev-item">
-                <img class="ev-img" src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200">
-                <div class="ev-label">Twitter Verified</div>
-            </div>
-            <div class="ev-item">
-                <img class="ev-img" src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=200">
-                <div class="ev-label">Govt Archive</div>
-            </div>
-            <div class="ev-item">
-                <img class="ev-img" src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200">
-                <div class="ev-label">Fact Check API</div>
-            </div>
-        </div>
-
-        <button class="btn-verify" style="margin-top:25px; background:#233554;" onclick="location.reload()">नई जाँच शुरू करें</button>
-    </div>
-</div>
-
 <script>
+// 1. वो फोटो और टेक्स्ट जो खोज के दौरान दिखेंगे
 const steps = [
     { img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300", log: "> Google News स्कैन हो रहा है..." },
-    { img: "https://images.unsplash.com/photo-1611605698335-8b1569810432?w=300", log: "> Twitter API डेटा खंगाला जा रहा है..." },
-    { img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=300", log: "> सरकारी रिकॉर्ड्स की जाँच जारी है..." },
-    { img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300", log: "> AI विश्लेषण पूरा कर रहा है..." }
+    { img: "https://images.unsplash.com/photo-1611605698335-8b1569810432?w=300", log: "> Twitter API चेक हो रहा है..." },
+    { img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=300", log: "> सरकारी रिकॉर्ड्स देखे जा रहे हैं..." }
 ];
 
 function startDeepScan() {
     let input = document.getElementById('userInput').value;
-    if(!input) return alert("कृपया अपना दावा लिखें!");
+    if(!input) return alert("पहले कुछ लिखें!");
 
+    // 2. होम स्क्रीन छुपाओ और स्कैनिंग दिखाओ
     document.getElementById('main-ui').style.display = 'none';
     document.getElementById('scan-screen').style.display = 'block';
 
@@ -120,12 +22,10 @@ function startDeepScan() {
             i++;
         } else {
             clearInterval(timer);
+            // 3. अंत में वो रिपोर्ट और छोटे फोटो वाले सबूत दिखाओ
             document.getElementById('scan-screen').style.display = 'none';
             document.getElementById('result-screen').style.display = 'block';
         }
     }, 1200);
 }
 </script>
-
-</body>
-</html>
