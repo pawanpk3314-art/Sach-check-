@@ -1,96 +1,179 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SachCheck - Final</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0a192f; color: white; }
-        .header { background: #112240; padding: 15px; border-bottom: 1px solid #233554; font-weight: bold; }
-        .card { background: #112240; margin: 15px; padding: 20px; border-radius: 12px; border-left: 5px solid #4caf50; }
-        .input-box { width: 100%; background: transparent; border: none; border-bottom: 1px solid #233554; color: white; font-size: 18px; padding: 10px 0; outline: none; margin: 10px 0; }
-        .btn-verify { background: #4caf50; color: white; width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-        
-        .news-card { background: #112240; margin: 15px; border-radius: 15px; overflow: hidden; border: 1px solid #233554; }
-        .news-img { width: 100%; height: 180px; object-fit: cover; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SachCheck Startup</title>
 
-        #result-screen, #scan-screen { display: none; padding: 15px; }
-        .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .ev-link { text-decoration: none; display: block; background: #112240; border-radius: 10px; overflow: hidden; border: 1px solid #233554; }
-        .ev-img { width: 100%; height: 90px; object-fit: cover; }
-        .ev-label { font-size: 11px; padding: 8px; color: #1a73e8; font-weight: bold; text-align: center; }
-    </style>
+<style>
+:root{
+ --bg:#0f172a;
+ --card:#1e293b;
+ --accent:#38bdf8;
+ --red:#ef4444;
+ --green:#22c55e;
+ --gold:#facc15;
+}
+
+body{
+ margin:0;
+ font-family:'Segoe UI',sans-serif;
+ background:var(--bg);
+ color:white;
+ padding:15px;
+}
+
+.header{
+ text-align:center;
+ padding:25px;
+ background:var(--card);
+ border-radius:20px;
+ margin-bottom:20px;
+}
+
+.badge{
+ padding:5px 12px;
+ border-radius:20px;
+ font-size:12px;
+ font-weight:bold;
+}
+
+.free{ background:#334155; }
+.premium{ background:var(--gold); color:black; }
+
+.card{
+ background:var(--card);
+ padding:20px;
+ border-radius:20px;
+ margin-bottom:20px;
+}
+
+button{
+ padding:10px 20px;
+ border:none;
+ border-radius:20px;
+ background:var(--accent);
+ color:white;
+ cursor:pointer;
+ margin-top:10px;
+ font-weight:bold;
+}
+
+.status{
+ padding:6px 15px;
+ border-radius:20px;
+ display:inline-block;
+ margin-bottom:10px;
+ font-weight:bold;
+ font-size:13px;
+}
+
+.fake{ background:var(--red); }
+.true{ background:var(--green); }
+
+.progress{
+ height:15px;
+ background:#334155;
+ border-radius:10px;
+ margin-top:10px;
+ overflow:hidden;
+ display:none;
+}
+
+.progress-bar{
+ height:100%;
+ width:0%;
+ background:var(--green);
+ transition:1s;
+}
+
+.hidden{ display:none; }
+.small{ font-size:12px; color:#94a3b8; }
+</style>
 </head>
-<body onload="updateNews()">
 
-<div class="header">🛡️ SachCheck</div>
+<body onload="initApp()">
 
-<div id="main-ui">
-    <div class="card">
-        <div style="color: #4caf50; font-size: 14px; font-weight: bold;">📅 दावा जाँचें / Verify a Claim</div>
-        <input type="text" id="userInput" class="input-box" placeholder="यहाँ अपना सवाल लिखें...">
-        <button class="btn-verify" onclick="startDeepScan()">🛡️ Verify Claim</button>
-    </div>
-
-    <div style="padding: 10px 20px; color: #64ffda; font-weight: bold;">📰 ताज़ा समाचार / Latest News</div>
-    <div id="news-container"></div>
+<div class="header">
+<h1>🛡️ SachCheck</h1>
+<p>AI Fact Verification Platform</p>
+<div id="user-badge" class="badge free">FREE USER</div>
+<br>
+<button onclick="upgradeUser()">Upgrade to Premium 🚀</button>
 </div>
 
-<div id="scan-screen" style="text-align: center; padding-top: 50px;">
-    <h2 style="color: #64ffda;">AI डेटाबेस खोज रहा है...</h2>
-    <p>कृपया प्रतीक्षा करें</p>
+<div class="card">
+<div id="status" class="status fake">FAKE</div>
+<h2 id="claim">Loading...</h2>
+<p id="analysis"></p>
+
+<div id="premium-box" class="hidden">
+<h3>📊 Truth Probability</h3>
+<div class="progress">
+<div class="progress-bar" id="progress-bar"></div>
 </div>
-
-<div id="result-screen">
-    <div style="background: #112240; padding: 20 : 15px; border-radius: 15px; border: 1px solid #233554;">
-        <div style="background: #e74c3c; display: inline-block; padding: 5px 12px; border-radius: 5px; font-weight: bold; font-size: 13px;">🚨 FAKE / MISLEADING</div>
-        <h2 style="margin: 15px 0 10px 0;">विश्लेषण रिपोर्ट</h2>
-        <p style="font-size: 14px; opacity: 0.8;">यह दावा भ्रामक पाया गया है। नीचे दिए गए आधिकारिक स्रोतों में **सबूत (Highlight)** देखें।</p>
-        
-                <div class="evidence-grid">
-            <a href="https://www.thehindu.com/news/national/gujarat-hc-sets-aside-cic-order-to-gu-to-provide-info-on-pm-modis-degree/article66683526.ece#:~:text=The%20Gujarat%20High%20Court%20on%20Friday%20set%20aside%20an%20order" target="_blank" class="ev-link">
-                <img class="ev-img" src="https://images.unsplash.com/photo-1585829365234-781fcd50c30b?w=200">
-                <div class="ev-label">The Hindu (सबूत देखें)</div>
-            </a>
-            
-            <a href="https://twitter.com/PIBFactCheck#:~:text=verified" target="_blank" class="ev-link">
-                <img class="ev-img" src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200">
-                <div class="ev-label">PIB Check (Twitter)</div>
-            </a>
-        </div>
-
-        <button class="btn-verify" style="background:#233554; width:100%; margin-top:20px;" onclick="location.reload()">नई जाँच शुरू करें</button>
-    </div>
+<p class="small">Advanced AI confidence score</p>
+</div>
 </div>
 
 <script>
-const allNews = [
-    { title: "Intel CEO Lip-Bu Tan: I was shocked to find China's Huawei...", source: "Times of India", img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500" },
-    { title: "AI Technology reaches new heights in 2026", source: "TechCrunch", img: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=500" },
-    { title: "Electric vehicle sales double in last quarter", source: "Reuters", img: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=500" }
+
+let userTier = "free";
+
+const claims = [
+{
+status:"fake",
+title:"दावा: सोशल मीडिया पर वायरल खबर सच है?",
+analysis:"यह दावा भ्रामक पाया गया है।"
+},
+{
+status:"true",
+title:"दावा: AI इंडस्ट्री तेजी से बढ़ रही है?",
+analysis:"AI सेक्टर में बड़े स्तर पर निवेश और विकास हो रहा है।"
+}
 ];
 
-function updateNews() {
-    let randomNews = allNews[Math.floor(Math.random() * allNews.length)];
-    document.getElementById('news-container').innerHTML = `
-        <div class="news-card">
-            <img class="news-img" src="${randomNews.img}">
-            <div style="padding: 15px;">
-                <div style="font-size: 16px; font-weight: bold;">${randomNews.title}</div>
-                <div style="color: #1a73e8; font-size: 12px;">${randomNews.source}</div>
-            </div>
-        </div>`;
+function initApp(){
+loadClaim();
 }
 
-function startDeepScan() {
-    if(!document.getElementById('userInput').value) return alert("कुछ टाइप करें!");
-    document.getElementById('main-ui').style.display = 'none';
-    document.getElementById('scan-screen').style.display = 'block';
-    setTimeout(() => {
-        document.getElementById('scan-screen').style.display = 'none';
-        document.getElementById('result-screen').style.display = 'block';
-    }, 2000);
+function loadClaim(){
+let random = claims[Math.floor(Math.random()*claims.length)];
+
+document.getElementById("status").innerText =
+random.status === "true" ? "TRUE" : "FAKE";
+
+document.getElementById("status").className = "status " + random.status;
+document.getElementById("claim").innerText = random.title;
+document.getElementById("analysis").innerText = random.analysis;
+
+if(userTier === "premium"){
+showTruthScore(random.status);
 }
+}
+
+function upgradeUser(){
+let code = prompt("Enter Startup Invite Code:");
+
+if(code === "STARTUP2026"){
+userTier = "premium";
+document.getElementById("user-badge").innerText = "PREMIUM USER";
+document.getElementById("user-badge").className = "badge premium";
+document.getElementById("premium-box").classList.remove("hidden");
+alert("🚀 Premium Activated!");
+loadClaim();
+}else if(code !== null){
+alert("Invalid Code");
+}
+}
+
+function showTruthScore(status){
+let percent = status === "true" ? 88 : 18;
+document.querySelector(".progress").style.display="block";
+document.getElementById("progress-bar").style.width = percent + "%";
+}
+
 </script>
+
 </body>
 </html>
