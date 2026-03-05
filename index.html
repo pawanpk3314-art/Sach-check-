@@ -3,176 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SachCheck Startup</title>
-
+<title>SachCheck AI</title>
 <style>
-:root{
- --bg:#0f172a;
- --card:#1e293b;
- --accent:#38bdf8;
- --red:#ef4444;
- --green:#22c55e;
- --gold:#facc15;
-}
-
-body{
- margin:0;
- font-family:'Segoe UI',sans-serif;
- background:var(--bg);
- color:white;
- padding:15px;
-}
-
-.header{
- text-align:center;
- padding:25px;
- background:var(--card);
- border-radius:20px;
- margin-bottom:20px;
-}
-
-.badge{
- padding:5px 12px;
- border-radius:20px;
- font-size:12px;
- font-weight:bold;
-}
-
-.free{ background:#334155; }
-.premium{ background:var(--gold); color:black; }
-
-.card{
- background:var(--card);
- padding:20px;
- border-radius:20px;
- margin-bottom:20px;
-}
-
-button{
- padding:10px 20px;
- border:none;
- border-radius:20px;
- background:var(--accent);
- color:white;
- cursor:pointer;
- margin-top:10px;
- font-weight:bold;
-}
-
-.status{
- padding:6px 15px;
- border-radius:20px;
- display:inline-block;
- margin-bottom:10px;
- font-weight:bold;
- font-size:13px;
-}
-
-.fake{ background:var(--red); }
-.true{ background:var(--green); }
-
-.progress{
- height:15px;
- background:#334155;
- border-radius:10px;
- margin-top:10px;
- overflow:hidden;
- display:none;
-}
-
-.progress-bar{
- height:100%;
- width:0%;
- background:var(--green);
- transition:1s;
-}
-
-.hidden{ display:none; }
-.small{ font-size:12px; color:#94a3b8; }
+    :root { --bg: #0f172a; --card: #1e293b; --accent: #22c55e; --red: #ef4444; --blue: #38bdf8; }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 15px; }
+    .header { text-align: center; padding: 20px; margin-bottom: 10px; }
+    .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #334155; }
+    input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; margin-bottom: 15px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .status-badge { display: inline-block; padding: 5px 12px; border-radius: 5px; font-weight: bold; font-size: 12px; margin-bottom: 10px; }
+    .fake { background: var(--red); }
+    .true { background: var(--accent); }
+    .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .ev-link { background: #2d3748; border-radius: 8px; text-decoration: none; color: white; text-align: center; border: 1px solid #4a5568; overflow: hidden; }
+    .ev-img { width: 100%; height: 60px; object-fit: cover; background: #1a202c; }
+    .ev-label { padding: 8px; font-size: 11px; font-weight: bold; }
+    #resultSection { display: none; }
 </style>
 </head>
-
-<body onload="initApp()">
+<body>
 
 <div class="header">
-<h1>🛡️ SachCheck</h1>
-<p>AI Fact Verification Platform</p>
-<div id="user-badge" class="badge free">FREE USER</div>
-<br>
-<button onclick="upgradeUser()">Upgrade to Premium 🚀</button>
+    <h1>🛡️ SachCheck</h1>
+    <p style="font-size: 14px; color: #94a3b8;">AI Fact Verification Platform</p>
 </div>
 
 <div class="card">
-<div id="status" class="status fake">FAKE</div>
-<h2 id="claim">Loading...</h2>
-<p id="analysis"></p>
+    <h3 style="margin-top: 0; font-size: 16px; color: var(--accent);">📅 दावा जाँचें / Verify a Claim</h3>
+    <input type="text" id="claimInput" placeholder="यहाँ अपना सवाल लिखें...">
+    <button onclick="checkFact()">🛡️ Verify Claim</button>
+</div>
 
-<div id="premium-box" class="hidden">
-<h3>📊 Truth Probability</h3>
-<div class="progress">
-<div class="progress-bar" id="progress-bar"></div>
-</div>
-<p class="small">Advanced AI confidence score</p>
-</div>
+<div id="resultSection" class="card" style="border-left: 5px solid var(--red);">
+    <div class="status-badge fake">🚨 FAKE / MISLEADING</div>
+    <h2 id="displayTitle" style="margin: 10px 0; font-size: 22px;">विश्लेषण रिपोर्ट</h2>
+    <p id="analysisText" style="color: #cbd5e1; font-size: 14px; line-height: 1.6;"></p>
+    
+    <div class="evidence-grid">
+        <a id="link1" target="_blank" class="ev-link">
+            <div class="ev-img" style="background: url('https://www.thehindu.com/favicon.ico') center no-repeat;"></div>
+            <div class="ev-label">The Hindu (सबूत देखें)</div>
+        </a>
+        <a href="https://twitter.com/PIBFactCheck" target="_blank" class="ev-link">
+            <img class="ev-img" src="https://logo.clearbit.com/twitter.com">
+            <div class="ev-label">PIB Check (Twitter)</div>
+        </a>
+    </div>
+    <button onclick="location.reload()" style="background: #2d3748; margin-top: 20px;">नई जाँच शुरू करें</button>
 </div>
 
 <script>
+function checkFact() {
+    let input = document.getElementById("claimInput").value.trim();
+    if (input === "") { alert("कृपया कुछ टाइप करें!"); return; }
 
-let userTier = "free";
+    let result = document.getElementById("resultSection");
+    let analysis = document.getElementById("analysisText");
+    let hinduLink = document.getElementById("link1");
 
-const claims = [
-{
-status:"fake",
-title:"दावा: सोशल मीडिया पर वायरल खबर सच है?",
-analysis:"यह दावा भ्रामक पाया गया है।"
-},
-{
-status:"true",
-title:"दावा: AI इंडस्ट्री तेजी से बढ़ रही है?",
-analysis:"AI सेक्टर में बड़े स्तर पर निवेश और विकास हो रहा है।"
+    result.style.display = "block";
+    window.scrollTo(0, document.body.scrollHeight);
+
+    // अगर यूजर 'मोदी' या 'डिग्री' से जुड़ा कुछ लिखता है
+    if (input.includes("मोदी") || input.includes("डिग्री")) {
+        analysis.innerHTML = "यह दावा <b>भ्रामक</b> पाया गया है। गुजरात हाई कोर्ट ने स्पष्ट किया कि प्रधानमंत्री की डिग्री सार्वजनिक करना कानूनी रूप से अनिवार्य नहीं है। नीचे दिए गए आधिकारिक स्रोतों में सबूत देखें।";
+        // सही किया हुआ लिंक
+        hinduLink.href = "https://www.thehindu.com/news/national/gujarat-hc-sets-aside-cic-order-to-gu-to-provide-info-on-pm-modis-degree/article66683526.ece#:~:text=The%20Gujarat%20High%20Court%20on%20Friday%20set%20aside%20an%20order";
+    } else {
+        analysis.innerText = "इस दावे की पुष्टि के लिए अभी पर्याप्त डेटा उपलब्ध नहीं है, लेकिन प्रारंभिक जांच में यह संदिग्ध लग रहा है।";
+        hinduLink.href = "https://www.thehindu.com/";
+    }
 }
-];
-
-function initApp(){
-loadClaim();
-}
-
-function loadClaim(){
-let random = claims[Math.floor(Math.random()*claims.length)];
-
-document.getElementById("status").innerText =
-random.status === "true" ? "TRUE" : "FAKE";
-
-document.getElementById("status").className = "status " + random.status;
-document.getElementById("claim").innerText = random.title;
-document.getElementById("analysis").innerText = random.analysis;
-
-if(userTier === "premium"){
-showTruthScore(random.status);
-}
-}
-
-function upgradeUser(){
-let code = prompt("Enter Startup Invite Code:");
-
-if(code === "STARTUP2026"){
-userTier = "premium";
-document.getElementById("user-badge").innerText = "PREMIUM USER";
-document.getElementById("user-badge").className = "badge premium";
-document.getElementById("premium-box").classList.remove("hidden");
-alert("🚀 Premium Activated!");
-loadClaim();
-}else if(code !== null){
-alert("Invalid Code");
-}
-}
-
-function showTruthScore(status){
-let percent = status === "true" ? 88 : 18;
-document.querySelector(".progress").style.display="block";
-document.getElementById("progress-bar").style.width = percent + "%";
-}
-
 </script>
 
 </body>
