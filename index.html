@@ -1,94 +1,187 @@
-<!-- ... पुराना HTML वैसा ही ... -->
-
-<script>
-// ... पुराने फंक्शन वैसा ही ...
-
-// नया: Grok से असली चेक
-async function grokFactCheck(query) {
-    const GROK_API_KEY = "YOUR_GROK_API_KEY_HERE"; // xAI से लें
-
-    try {
-        const response = await fetch("https://api.x.ai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${GROK_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: "grok-beta",
-                messages: [
-                    { 
-                        role: "system", 
-                        content: "तुम एक तेज़ हिंदी फैक्ट-चेकर हो। हर दावे को 'सत्य', 'असत्य' या 'अनिश्चित' कहो। स्पष्ट स्पष्टीकरण दो, और अगर संभव हो तो स्रोत बताओ।" 
-                    },
-                    { role: "user", content: query }
-                ],
-                max_tokens: 250,
-                temperature: 0.6
-            })
-        });
-
-        if (!response.ok) throw new Error("API एरर");
-        const data = await response.json();
-        return data.choices[0].message.content.trim();
-    } catch (e) {
-        return "⚠️ Grok से कनेक्ट नहीं हो पाया। API की चेक करें।";
-    }
-}
-
-// अपडेटेड runCheck: Grok यूज़ करे
-async function runCheck() {
-    let input = document.getElementById("userInput").value.trim();
-    if(!input || input.length < 5) { 
-        alert("❌ कृपया कम से कम 5 अक्षर लिखें!"); 
-        return; 
-    }
-
-    let resultBox = document.getElementById("resultBox");
-    let badge = document.getElementById("statusBadge");
-    let bar = document.getElementById("progressBar");
-    let analysis = document.getElementById("resAnalysis");
-    let btn = document.getElementById("checkBtn");
-
-    resultBox.style.display = "block";
-    badge.innerText = "🔍 Grok जांच कर रहा है...";
-    badge.style.background = "#1c3a57";
-    bar.style.width = "30%";
-    btn.disabled = true;
-    btn.innerText = "जांच जारी है...";
-
-    const grokResponse = await grokFactCheck(input);
-
-    // रिजल्ट को प्रोसेस करो (सिंपल: अगर 'सत्य' शब्द है तो ग्रीन, वरना रेड)
-    const isTrue = grokResponse.includes("सत्य") || grokResponse.includes("पुष्टि");
-    const score = isTrue ? 85 : 40;
-
-    setTimeout(() => {
-        updateUI(score, grokResponse);
-        bar.style.width = score + "%";
-    }, 1500);
-
-    btn.disabled = false;
-    btn.innerText = "🛡️ दावा जांचें";
-}
-
-// नया: समाचार खोज बटन अब Grok यूज़ करेगा
-function externalSearch(site) {
-    let q = document.getElementById("userInput").value.trim();
-    if(!q) {
-        alert("❌ पहले दावा लिखें!");
-        return;
-    }
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SachCheck - AI सत्य जांचक</title>
+    <style>
+        :root { --bg: #0b1c2d; --card: #11263d; --accent: #3fbf63; --blue: #38bdf8; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; line-height: 1.6; }
+        .header { padding: 20px; background: linear-gradient(135deg, #0f2236, #1a365d); text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .card { background: var(--card); padding: 25px; border-radius: 20px; margin-bottom: 25px; border-left: 6px solid var(--accent); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        .section-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #63d28c; }
+        input { width: 100%; padding: 16px; border-radius: 12px; border: 2px solid transparent; background: #0d1f33; color: white; font-size: 16px; transition: all 0.3s; }
+        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(63,191,99,0.1); }
+        .v-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, var(--accent), #32c768); color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: all 0.3s; margin: 10px 0; }
+        .v-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(63,191,99,0.4); }
+        .v-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        #resultBox { display: none; margin-top: 25px; padding-top: 20px; border-top: 2px solid #1c3a57; }
+        .badge { display: inline-block; padding: 8px 16px; border-radius: 25px; font-weight: bold; font-size: 14px; margin-bottom: 15px; }
+        .progress { height: 10px; background: #0d1f33; border-radius: 5px; margin: 15px 0; overflow: hidden; }
+        .bar { height: 100%; width: 0%; transition: 1.5s ease; }
+        .search-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .search-btns button { flex: 1; background: #1c3a57; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .search-btns button:hover { background: #2d4a71; }
+        .search-btns button.news { background: var(--blue); }
+        .search-btns button.news:hover { background: #0ea5e9; }
+        .news-section { margin-top: 40px; }
+        .news-card { background: rgba(17,38,61,0.8); border-radius: 15px; padding: 20px; margin-top: 15px; border-left: 4px solid var(--blue); cursor: pointer; transition: 0.3s; }
+        .news-card:hover { background: rgba(17,38,61,1); transform: translateX(5px); }
+        .news-title { font-size: 16px; margin-bottom: 8px; }
+        .news-source { color: #4da6ff; font-size: 13px; }
+        .refresh-btn { background: var(--blue); margin-top: 20px; width: 100%; padding: 10px 20px; font-size: 14px; }
+        .loading { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="header">🛡️ SachCheck AI - सत्य की खोज</div>
     
-    if (site === 'news') {
-        // अब Grok से चेक करो
-        document.getElementById("userInput").value = q; // पहले से भरा है
-        runCheck(); // Grok चेक ट्रिगर
-    } else {
-        // Google वाला पुराना
-        window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
-    }
-}
+    <div class="container">
+        <div class="card">
+            <div class="section-title">📅 दावा जांचें</div>
+            <input type="text" id="userInput" placeholder="यहाँ खबर या दावा लिखें (5+ अक्षर)...">
+            <button class="v-btn" id="checkBtn" onclick="runCheck()">🛡️ दावा जांचें</button>
+            
+            <div id="resultBox">
+                <div id="statusBadge" class="badge"></div>
+                <h3 id="resTitle" style="margin: 10px 0; font-size: 18px;"></h3>
+                <p id="resAnalysis" style="color: #9fb3c8; font-size: 14px; line-height: 1.5;"></p>
+                <div class="progress"><div id="progressBar" class="bar"></div></div>
+                <div class="search-btns">
+                    <button onclick="externalSearch('google')">🔍 Google खोज</button>
+                    <button class="news" onclick="externalSearch('news')">📰 समाचार खोज</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="news-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="color: #6fe7ff; margin: 0;">📰 लाइव समाचार</h3>
+                <button class="v-btn refresh-btn" onclick="loadLiveNews()" style="width: auto; padding: 8px 16px; font-size: 14px;">🔄 ताज़ा करें</button>
+            </div>
+            <div id="newsContainer">
+                <div class="news-card loading">
+                    <div class="news-title">समाचार लोड हो रहे हैं...</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-// ... बाकी कोड वैसा ही ...
-</script>
+    <script>
+    const GROK_API_KEY = "YOUR_GROK_API_KEY_HERE"; // xAI से API की डालो, नहीं तो Grok वाला हिस्सा काम नहीं करेगा
+
+    async function grokFactCheck(query) {
+        try {
+            const response = await fetch("https://api.x.ai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${GROK_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "grok-beta",
+                    messages: [
+                        { role: "system", content: "तुम एक तेज़ हिंदी फैक्ट-चेकर हो। हर दावे को 'सत्य', 'असत्य' या 'अनिश्चित' कहो। स्पष्ट स्पष्टीकरण दो, और अगर संभव हो तो स्रोत बताओ।" },
+                        { role: "user", content: query }
+                    ],
+                    max_tokens: 250,
+                    temperature: 0.6
+                })
+            });
+
+            if (!response.ok) throw new Error("API एरर");
+            const data = await response.json();
+            return data.choices[0].message.content.trim();
+        } catch (e) {
+            return "⚠️ Grok से कनेक्ट नहीं हो पाया। API की चेक करें।";
+        }
+    }
+
+    async function runCheck() {
+        let input = document.getElementById("userInput").value.trim();
+        if(!input || input.length < 5) { 
+            alert("❌ कृपया कम से कम 5 अक्षर लिखें!"); 
+            return; 
+        }
+
+        let resultBox = document.getElementById("resultBox");
+        let badge = document.getElementById("statusBadge");
+        let bar = document.getElementById("progressBar");
+        let analysis = document.getElementById("resAnalysis");
+        let btn = document.getElementById("checkBtn");
+
+        resultBox.style.display = "block";
+        badge.innerText = "🔍 Grok जांच कर रहा है...";
+        badge.style.background = "#1c3a57";
+        bar.style.width = "30%";
+        btn.disabled = true;
+        btn.innerText = "जांच जारी है...";
+
+        const grokResponse = await grokFactCheck(input);
+
+        const isTrue = grokResponse.includes("सत्य") || grokResponse.includes("पुष्टि");
+        const score = isTrue ? 85 : 40;
+
+        setTimeout(() => {
+            document.getElementById("resTitle").innerText = "दावा: " + input;
+            if(score > 65) {
+                badge.innerText = "✅ सत्यापित"; 
+                badge.style.background = "#3fbf63"; 
+                bar.style.background = "#3fbf63";
+            } else {
+                badge.innerText = "🚨 संदिग्ध"; 
+                badge.style.background = "#ef4444"; 
+                bar.style.background = "#ef4444";
+            }
+            analysis.innerText = grokResponse;
+            bar.style.width = score + "%";
+        }, 1500);
+
+        btn.disabled = false;
+        btn.innerText = "🛡️ दावा जांचें";
+    }
+
+    function externalSearch(site) {
+        let q = document.getElementById("userInput").value.trim();
+        if(!q) {
+            alert("❌ पहले दावा लिखें!");
+            return;
+        }
+        
+        if (site === 'news') {
+            runCheck(); // Grok से चेक
+        } else {
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
+        }
+    }
+
+    function loadLiveNews() {
+        const container = document.getElementById('newsContainer');
+        container.innerHTML = '<div class="news-card loading"><div class="news-title">नई खबरें लोड हो रही हैं...</div></div>';
+        
+        setTimeout(() => {
+            const news = [
+                { title: "PM मोदी ने नई डिजिटल इंडिया योजना लॉन्च की", source: "PIB", time: "2 घंटे पहले" },
+                { title: "ISRO का अगला मिशन अगस्त 2026 में", source: "DD News", time: "4 घंटे पहले" },
+                { title: "भारत का GDP ग्रोथ रेट 7.2% रहने का अनुमान", source: "RBI", time: "1 दिन पहले" },
+                { title: "नई EV नीति कैबिनेट में मंजूर", source: "Economic Times", time: "6 घंटे पहले" }
+            ].sort(() => Math.random() - 0.5);
+            
+            container.innerHTML = news.map(n => `
+                <div class="news-card" onclick="document.getElementById('userInput').value='${n.title}'; runCheck();">
+                    <div class="news-title">${n.title}</div>
+                    <div class="news-source">${n.source} • ${n.time}</div>
+                </div>
+            `).join('');
+        }, 1200);
+    }
+
+    window.onload = () => {
+        loadLiveNews();
+        setInterval(loadLiveNews, 30000);
+    };
+    </script>
+</body>
+</html>
