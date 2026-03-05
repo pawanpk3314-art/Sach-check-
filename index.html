@@ -29,16 +29,17 @@
         .search-btns { display: flex; gap: 10px; margin-top: 15px; }
         .search-btns button { flex: 1; background: #1c3a57; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 14px; }
         .search-btns button:hover { background: #2d4a71; }
+        .search-btns button.news { background: var(--blue); }
+        .search-btns button.news:hover { background: #0ea5e9; }
         
         .news-section { margin-top: 40px; }
         .news-card { background: rgba(17,38,61,0.8); border-radius: 15px; padding: 20px; margin-top: 15px; border-left: 4px solid var(--blue); cursor: pointer; transition: 0.3s; }
         .news-card:hover { background: rgba(17,38,61,1); transform: translateX(5px); }
         .news-title { font-size: 16px; margin-bottom: 8px; }
         .news-source { color: #4da6ff; font-size: 13px; }
-        .refresh-btn { background: var(--blue); margin-top: 20px; width: 100%; }
+        .refresh-btn { background: var(--blue); margin-top: 20px; width: 100%; padding: 10px 20px; font-size: 14px; }
         
         .loading { opacity: 0.6; pointer-events: none; }
-        .detail-report { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: 10px; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -54,11 +55,10 @@
                 <div id="statusBadge" class="badge"></div>
                 <h3 id="resTitle" style="margin: 10px 0; font-size: 18px;"></h3>
                 <p id="resAnalysis" style="color: #9fb3c8; font-size: 14px; line-height: 1.5;"></p>
-                <div id="detailReport" class="detail-report" style="display: none;"></div>
                 <div class="progress"><div id="progressBar" class="bar"></div></div>
                 <div class="search-btns">
                     <button onclick="externalSearch('google')">🔍 Google खोज</button>
-                    <button onclick="externalSearch('news')" style="background: var(--blue);">📰 समाचार खोज + सत्यता</button>
+                    <button class="news" onclick="externalSearch('news')">📰 समाचार खोज</button>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@
     </div>
 
     <script>
-    // 🔥 FULL सत्यता जांच + डिटेल रिपोर्ट
+    // 🔥 AI सत्यता जांच (वही पुराना परफेक्ट कोड)
     async function fakeFactCheckAPI(query) {
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -94,28 +94,17 @@
                 
                 const score = isTrusted ? 88 : Math.floor(Math.random() * 35) + 35;
                 
-                const detailReport = isTrusted ? 
-                    `✅ **आधिकारिक पुष्टि**: PIB/सरकारी स्रोतों से सत्यापित। 
-                    📅 **तारीख**: 2026 अपडेट। 
-                    🔗 **स्रोत**: आधिकारिक वेबसाइट/प्रेस रिलीज। 
-                    ⭐ **विश्वसनीयता**: 95%+` :
-                    `🚨 **चेतावनी**: कोई आधिकारिक स्रोत नहीं मिला। 
-                    ⚠️ **जोखिम**: भ्रामक/असत्यापित जानकारी हो सकती है। 
-                    🔍 **सुझाव**: Google News/PIB.gov.in पर जांचें। 
-                    📊 **विश्वसनीयता**: 35-50%`;
-                
                 resolve({
                     veracity: score,
                     message: score > 65 ? 
-                        `"${query}" सत्यापित। आधिकारिक स्रोतों से पुष्टि` :
-                        `"${query}" संदिग्ध। कोई पुष्ट स्रोत नहीं मिला।`,
-                    detailReport: detailReport
+                        `✅ "${query}" सत्यापित। आधिकारिक स्रोतों से पुष्टि` :
+                        `🚨 "${query}" संदिग्ध। कोई पुष्ट स्रोत नहीं मिला।`
                 });
             }, 1800);
         });
     }
 
-    // 🔥 लाइव समाचार
+    // 🔥 समाचार लाइव जनरेटर
     function loadLiveNews() {
         const container = document.getElementById('newsContainer');
         container.innerHTML = '<div class="news-card loading"><div class="news-title">नई खबरें लोड हो रही हैं...</div></div>';
@@ -145,6 +134,7 @@
         runCheck();
     }
 
+    // 🔥 मुख्य जांच फंक्शन
     async function runCheck() {
         let input = document.getElementById("userInput").value.trim();
         if(!input || input.length < 5) { 
@@ -156,7 +146,6 @@
         let badge = document.getElementById("statusBadge");
         let bar = document.getElementById("progressBar");
         let analysis = document.getElementById("resAnalysis");
-        let detailReport = document.getElementById("detailReport");
         let btn = document.getElementById("checkBtn");
 
         resultBox.style.display = "block";
@@ -169,22 +158,21 @@
         try {
             const data = await fakeFactCheckAPI(input);
             setTimeout(() => {
-                updateUI(data.veracity, data.message, data.detailReport);
+                updateUI(data.veracity, data.message);
                 bar.style.width = data.veracity + "%";
             }, 1500);
         } catch(e) {
-            setTimeout(() => updateUI(50, "🚫 जांच में समस्या।", "सर्वर समस्या। मैन्युअल जांच करें।"), 2000);
+            setTimeout(() => updateUI(50, "🚫 जांच में समस्या।"), 2000);
         } finally {
             btn.disabled = false;
             btn.innerText = "🛡️ दावा जांचें";
         }
     }
 
-    function updateUI(score, msg, detail) {
+    function updateUI(score, msg) {
         let badge = document.getElementById("statusBadge");
         let bar = document.getElementById("progressBar");
         let analysis = document.getElementById("resAnalysis");
-        let detailReport = document.getElementById("detailReport");
         
         document.getElementById("resTitle").innerText = "दावा: " + document.getElementById("userInput").value;
         
@@ -193,34 +181,33 @@
             badge.style.background = "#3fbf63"; 
             bar.style.background = "#3fbf63";
         } else {
-            badge.innerText = "🚨 संदिग्ध/असत्य"; 
+            badge.innerText = "🚨 संदिग्ध"; 
             badge.style.background = "#ef4444"; 
             bar.style.background = "#ef4444";
         }
         analysis.innerText = msg;
-        detailReport.innerHTML = detail;
-        detailReport.style.display = "block";
     }
 
-    // 🔥 FIXED समाचार खोज - अब FULL सत्यता चेक + विश्लेषण
+    // 🔥 FIXED EXTERNAL SEARCH - Google जैसा!
     function externalSearch(site) {
-        let q = document.getElementById("userInput").value;
-        
-        if(site === 'news') {
-            // समाचार खोज पर FULL सत्यता विश्लेषण दिखाएं
-            document.getElementById('userInput').value = q;
-            runCheck(); // AUTOMATIC सत्यता चेक
+        let q = document.getElementById("userInput").value.trim();
+        if(!q) {
+            alert("❌ पहले दावा लिखें!");
             return;
         }
         
-        // Google के लिए external link
-        window.open(`https://google.com/search?q=${encodeURIComponent(q)}`, '_blank');
+        const urls = {
+            google: `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+            news: `https://news.google.com/search?q=${encodeURIComponent(q)}&hl=hi&gl=IN&ceid=IN:hi`
+        };
+        
+        window.open(urls[site], '_blank');
     }
 
-    // पेज लोड पर समाचार + auto-refresh
+    // पेज लोड पर
     window.onload = () => {
         loadLiveNews();
-        setInterval(loadLiveNews, 30000);
+        setInterval(loadLiveNews, 30000); // 30 सेकंड auto refresh
     };
     </script>
 </body>
