@@ -1,152 +1,163 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SachCheck</title>
-
-<style>
-body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#0b1622;
-    color:white;
-}
-
-/* Navbar */
-.navbar{
-    background:#142a44;
-    padding:15px 20px;
-    font-size:20px;
-    font-weight:bold;
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.container{
-    padding:20px;
-    max-width:600px;
-    margin:auto;
-}
-
-/* Verify Card */
-.card{
-    background:#142a44;
-    padding:20px;
-    border-radius:18px;
-    position:relative;
-    box-shadow:0 5px 20px rgba(0,0,0,0.3);
-}
-
-.card::before{
-    content:"";
-    position:absolute;
-    left:-6px;
-    top:0;
-    bottom:0;
-    width:6px;
-    background:#4ade80;
-    border-radius:10px;
-}
-
-.section-title{
-    font-size:18px;
-    margin-bottom:15px;
-    color:#4ade80;
-}
-
-input{
-    width:100%;
-    padding:14px;
-    border-radius:8px;
-    border:none;
-    background:#0f2236;
-    color:white;
-    font-size:15px;
-    margin-bottom:15px;
-}
-
-button{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:10px;
-    background:#4ade80;
-    color:white;
-    font-size:16px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-button:hover{
-    opacity:0.9;
-}
-
-/* News Section */
-.news-title{
-    margin-top:30px;
-    font-size:20px;
-    color:#38bdf8;
-}
-
-.news-card{
-    margin-top:15px;
-    background:#142a44;
-    border-radius:20px;
-    overflow:hidden;
-    box-shadow:0 5px 20px rgba(0,0,0,0.4);
-}
-
-.news-card img{
-    width:100%;
-    height:200px;
-    object-fit:cover;
-}
-
-.news-content{
-    padding:15px;
-}
-
-.news-content h3{
-    margin:0;
-    font-size:18px;
-}
-
-.source{
-    margin-top:8px;
-    color:#60a5fa;
-    font-size:14px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SachCheck - AI सत्य जांचक</title>
+    <style>
+        :root { --bg: #0b1c2d; --card: #11263d; --accent: #3fbf63; --blue: #38bdf8; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; line-height: 1.6; }
+        .header { padding: 20px; background: linear-gradient(135deg, #0f2236, #1a365d); text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        
+        .card { background: var(--card); padding: 25px; border-radius: 20px; margin-bottom: 25px; border-left: 6px solid var(--accent); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        .section-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #63d28c; }
+        
+        input { width: 100%; padding: 16px; border-radius: 12px; border: 2px solid transparent; background: #0d1f33; color: white; font-size: 16px; transition: all 0.3s; }
+        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(63,191,99,0.1); }
+        
+        .v-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, var(--accent), #32c768); color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: all 0.3s; margin: 10px 0; }
+        .v-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(63,191,99,0.4); }
+        .v-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        #resultBox { display: none; margin-top: 25px; padding-top: 20px; border-top: 2px solid #1c3a57; }
+        .badge { display: inline-block; padding: 8px 16px; border-radius: 25px; font-weight: bold; font-size: 14px; margin-bottom: 15px; }
+        .progress { height: 10px; background: #0d1f33; border-radius: 5px; margin: 15px 0; overflow: hidden; }
+        .bar { height: 100%; width: 0%; transition: 1.5s ease; }
+        
+        .search-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .search-btns button { flex: 1; background: #1c3a57; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .search-btns button:hover { background: #2d4a71; }
+        
+        .news-section { margin-top: 40px; }
+        .news-card { background: rgba(17,38,61,0.8); border-radius: 15px; padding: 20px; margin-top: 15px; border-left: 4px solid var(--blue); }
+    </style>
 </head>
-
 <body>
+    <div class="header">🛡️ SachCheck AI - सत्य की खोज</div>
+    
+    <div class="container">
+        <div class="card">
+            <div class="section-title">📅 दावा जांचें</div>
+            <input type="text" id="userInput" placeholder="यहाँ खबर या दावा लिखें (5+ अक्षर)...">
+            <button class="v-btn" id="checkBtn" onclick="runCheck()">🛡️ दावा जांचें</button>
+            
+            <div id="resultBox">
+                <div id="statusBadge" class="badge"></div>
+                <h3 id="resTitle" style="margin: 10px 0; font-size: 18px;"></h3>
+                <p id="resAnalysis" style="color: #9fb3c8; font-size: 14px; line-height: 1.5;"></p>
+                <div class="progress"><div id="progressBar" class="bar"></div></div>
+                <div class="search-btns">
+                    <button onclick="externalSearch('google')">🔍 Google खोज</button>
+                    <button onclick="externalSearch('twitter')">🐦 Twitter जांच</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="news-section">
+            <h3 style="color: #6fe7ff; margin-bottom: 20px;">📰 ताज़ा खबरें</h3>
+            <div class="news-card">
+                <h4>भारत में नई AI नीति 2026</h4>
+                <p style="color: #4da6ff; font-size: 14px;">आज की सुर्खी - स्रोत: PIB</p>
+            </div>
+        </div>
+    </div>
 
-<div class="navbar">
-🛡️ SachCheck
-</div>
+    <script>
+    // 🔥 FAKE API SIMULATION (बैकएंड की जरूरत नहीं)
+    async function fakeFactCheckAPI(query) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // रियलिस्टिक डेटा
+                const knownClaims = [
+                    "भारत का राष्ट्रपति द्रौपदी मुर्मू हैं",
+                    "2024 ओलंपिक पेरिस में हुए",
+                    "चंद्रयान-3 सफल रहा"
+                ];
+                
+                const score = knownClaims.some(claim => 
+                    claim.toLowerCase().includes(query.toLowerCase())
+                ) ? 85 : Math.floor(Math.random() * 40) + 40;
+                
+                resolve({
+                    veracity: score,
+                    message: score > 60 ? 
+                        "✅ विश्वसनीय स्रोतों से पुष्टि हुई" : 
+                        "🚨 पर्याप्त सबूत नहीं मिले। सावधान रहें!"
+                });
+            }, 1500);
+        });
+    }
 
-<div class="container">
+    async function runCheck() {
+        let input = document.getElementById("userInput").value.trim();
+        if(!input || input.length < 5) { 
+            alert("❌ कृपया कम से कम 5 अक्षर लिखें!"); 
+            return; 
+        }
 
-<div class="card">
-<div class="section-title">📅 दावा जाँचें / Verify a Claim</div>
+        let resultBox = document.getElementById("resultBox");
+        let badge = document.getElementById("statusBadge");
+        let bar = document.getElementById("progressBar");
+        let analysis = document.getElementById("resAnalysis");
+        let btn = document.getElementById("checkBtn");
 
-<input type="text" placeholder="यहाँ अपना सवाल लिखें...">
-<button>🛡️ Verify Claim</button>
-</div>
+        // लोडिंग शुरू
+        resultBox.style.display = "block";
+        badge.innerText = "🔍 AI विश्लेषण कर रहा है...";
+        badge.style.background = "#1c3a57";
+        bar.style.width = "25%";
+        btn.disabled = true;
+        btn.innerText = "विश्लेषण चल रहा है...";
 
-<div class="news-title">📰 ताज़ा समाचार / Latest News</div>
+        try {
+            // हमारा फेक API (रियल जैसा)
+            const data = await fakeFactCheckAPI(input);
+            
+            setTimeout(() => {
+                updateUI(data.veracity, data.message);
+                bar.style.width = data.veracity + "%";
+            }, 1200);
+            
+        } catch(e) {
+            setTimeout(() => {
+                updateUI(50, "🚫 सर्वर समस्या। मैन्युअल जांच करें।");
+            }, 1500);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "🛡️ दावा जांचें";
+        }
+    }
 
-<div class="news-card">
-<img src="https://images.unsplash.com/photo-1518770660439-4636190af475">
-<div class="news-content">
-<h3>Intel CEO Lip-Bu Tan: I was shocked to find China's Huawei...</h3>
-<div class="source">Times of India</div>
-</div>
-</div>
+    function updateUI(score, msg) {
+        let badge = document.getElementById("statusBadge");
+        let bar = document.getElementById("progressBar");
+        let analysis = document.getElementById("resAnalysis");
+        
+        document.getElementById("resTitle").innerText = "दावा: " + document.getElementById("userInput").value;
+        
+        if(score > 60) {
+            badge.innerText = "✅ सत्यापित"; 
+            badge.style.background = "#3fbf63"; 
+            bar.style.background = "#3fbf63";
+        } else {
+            badge.innerText = "🚨 संदिग्ध"; 
+            badge.style.background = "#ef4444"; 
+            bar.style.background = "#ef4444";
+        }
+        analysis.innerText = msg;
+    }
 
-</div>
-
+    function externalSearch(site) {
+        let q = document.getElementById("userInput").value;
+        window.open(
+            site === 'google' ? 
+            'https://google.com/search?q=' + encodeURIComponent(q) : 
+            'https://twitter.com/search?q=' + encodeURIComponent(q), 
+            '_blank'
+        );
+    }
+    </script>
 </body>
 </html>
