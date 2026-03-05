@@ -67,18 +67,16 @@
     async function fakeFactCheckAPI(query) {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const trustedClaims = ["भारत का राष्ट्रपति द्रौपदी मुर्मू हैं", "2026 का बजट 1 फरवरी को पेश हुआ"];
-                const isTrusted = trustedClaims.some(claim => claim.toLowerCase().includes(query.toLowerCase()));
-                const score = isTrusted ? 88 : Math.floor(Math.random() * 35) + 35;
-                resolve({
-                    veracity: score,
-                    message: score > 65 ? `✅ "\( {query}" सत्यापित।` : `🚨 " \){query}" संदिग्ध।`
-                });
+                const score = Math.floor(Math.random() * 100);
+                const message = score > 65 ? 
+                    `✅ "${query}" सत्यापित। आधिकारिक स्रोतों से पुष्टि` :
+                    `🚨 "${query}" संदिग्ध। कोई पुष्ट स्रोत नहीं मिला।`;
+                resolve({ veracity: score, message });
             }, 1800);
         });
     }
 
-    // Google न्यूज़ RSS से लाइव खबरें (हर 30 सेकंड अपडेट)
+    // Google न्यूज़ RSS से लाइव खबरें
     async function loadLiveNews() {
         const container = document.getElementById('newsContainer');
         container.innerHTML = '<div class="news-card loading"><div class="news-title">ताज़ा खबरें लोड हो रही हैं...</div></div>';
@@ -106,7 +104,7 @@
                     </div>
                 `;
             });
-            container.innerHTML = html || '<div class="news-card"><div class="news-title">कोई खबर नहीं।</div></div>';
+            container.innerHTML = html || '<div class="news-card"><div class="news-title">कोई खबर नहीं मिली।</div></div>';
         } catch (err) {
             container.innerHTML = '<div class="news-card"><div class="news-title">खबरें लोड नहीं हो सकीं।</div></div>';
         }
@@ -134,12 +132,12 @@
         setTimeout(() => {
             document.getElementById("resTitle").innerText = "दावा: " + input;
             if(data.veracity > 65) {
-                badge.innerText = "✅ सत्यापित";
-                badge.style.background = "#3fbf63";
+                badge.innerText = "✅ सत्यापित"; 
+                badge.style.background = "#3fbf63"; 
                 bar.style.background = "#3fbf63";
             } else {
-                badge.innerText = "🚨 संदिग्ध";
-                badge.style.background = "#ef4444";
+                badge.innerText = "🚨 संदिग्ध"; 
+                badge.style.background = "#ef4444"; 
                 bar.style.background = "#ef4444";
             }
             analysis.innerText = data.message;
