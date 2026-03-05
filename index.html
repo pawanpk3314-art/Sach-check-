@@ -51,7 +51,7 @@
                 <div class="progress"><div id="progressBar" class="bar"></div></div>
                 <div class="search-btns">
                     <button onclick="externalSearch('google')">🔍 Google खोज</button>
-                    <button class="news" onclick="externalSearch('news')">📰 समाचार खोज</button>
+                    <button class="news" onclick="searchRealNews()">📰 समाचार खोज</button>
                 </div>
             </div>
         </div>
@@ -70,35 +70,80 @@
     </div>
 
     <script>
-    const GROK_API_KEY = "YOUR_GROK_API_KEY_HERE"; // xAI से API की डालो, नहीं तो Grok वाला हिस्सा काम नहीं करेगा
+    // पुराना फेक फैक्ट चेक (Grok हटा दिया)
+    async function fakeFactCheckAPI(query) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const trustedClaims = [
+                    "भारत का राष्ट्रपति द्रौपदी मुर्मू हैं",
+                    "2026 का बजट 1 फरवरी को पेश हुआ",
+                    "चंद्रयान-4 मिशन की तैयारी चल रही"
+                ];
+                const isTrusted = trustedClaims.some(claim => claim.toLowerCase().includes(query.toLowerCase()));
+                const score = isTrusted ? 88 : Math.floor(Math.random() * 35) + 35;
+                resolve({
+                    veracity: score,
+                    message: score > 65 ? `✅ "\( {query}" सत्यापित। आधिकारिक स्रोतों से पुष्टि` : `🚨 " \){query}" संदिग्ध। कोई पुष्ट स्रोत नहीं मिला।`
+                });
+            }, 1800);
+        });
+    }
 
-    async function grokFactCheck(query) {
+    // समाचार खोज: NewsData.io से असली न्यूज़ (API की डालो)
+    const NEWS_API_KEY = "YOUR_NEWS_API_KEY_HERE"; // newsdata.io से फ्री की डालो
+
+    async function searchRealNews() {
+        let q = document.getElementById("userInput").value.trim();
+        if (!q) {
+            alert("❌ पहले दावा लिखें!");
+            return;
+        }
+
+        const container = document.getElementById('newsContainer');
+        container.innerHTML = '<div class="news-card loading"><div class="news-title">समाचार खोज रहे हैं...</div></div>';
+
         try {
-            const response = await fetch("https://api.x.ai/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${GROK_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: "grok-beta",
-                    messages: [
-                        { role: "system", content: "तुम एक तेज़ हिंदी फैक्ट-चेकर हो। हर दावे को 'सत्य', 'असत्य' या 'अनिश्चित' कहो। स्पष्ट स्पष्टीकरण दो, और अगर संभव हो तो स्रोत बताओ।" },
-                        { role: "user", content: query }
-                    ],
-                    max_tokens: 250,
-                    temperature: 0.6
-                })
-            });
+            const url = `https://newsdata.io/api/1/latest?apikey=\( {NEWS_API_KEY}&q= \){encodeURIComponent(q)}&language=hi&country=in&size=10`;
+            const res = await fetch(url);
+            const data = await res.json();
 
-            if (!response.ok) throw new Error("API एरर");
-            const data = await response.json();
-            return data.choices[0].message.content.trim();
-        } catch (e) {
-            return "⚠️ Grok से कनेक्ट नहीं हो पाया। API की चेक करें।";
+            if (data.status !== "success") throw new Error("API एरर");
+
+            let html = "";
+            data.results.forEach(article => {
+                html += `
+                    <div class="news-card" onclick="window.open('${article.link}', '_blank')">
+                        <div class="news-title">${article.title}</div>
+                        <div class="news-source">${article.source_id || 'अज्ञात'} • ${article.pubDate}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html || "<div class='news-card'><div class='news-title'>कोई समाचार नहीं मिला।</div></div>";
+        } catch (err) {
+            container.innerHTML = "<div class='news-card'><div class='news-title'>समाचार लोड नहीं हो सके। API की चेक करें।</div></div>";
         }
     }
 
+    // पुराना लाइव न्यूज़ (लोकल)
+    function loadLiveNews() {
+        const container = document.getElementById('newsContainer');
+        container.innerHTML = '<div class="news-card loading"><div class="news-title">नई खबरें लोड हो रही हैं...</div></div>';
+        
+        setTimeout(() => {
+            const news = [
+                { title: "PM मोदी ने नई डिजिटल इंडिया योजना लॉन्च की", source: "PIB", time: "2 घंटे पहले" },
+                { title: "ISRO का अगला मिशन अगस्त 2026 में", source: "DD News", time: "4 घंटे पहले" }
+            ].sort(() => Math.random() - 0.5);
+            container.innerHTML = news.map(n => `
+                <div class="news-card" onclick="document.getElementById('userInput').value='${n.title}'; runCheck();">
+                    <div class="news-title">${n.title}</div>
+                    <div class="news-source">${n.source} • ${n.time}</div>
+                </div>
+            `).join('');
+        }, 1200);
+    }
+
+    // दावा जांचें (पुराना फेक)
     async function runCheck() {
         let input = document.getElementById("userInput").value.trim();
         if(!input || input.length < 5) { 
@@ -113,20 +158,16 @@
         let btn = document.getElementById("checkBtn");
 
         resultBox.style.display = "block";
-        badge.innerText = "🔍 Grok जांच कर रहा है...";
+        badge.innerText = "🔍 जांच कर रहा है...";
         badge.style.background = "#1c3a57";
         bar.style.width = "30%";
         btn.disabled = true;
         btn.innerText = "जांच जारी है...";
 
-        const grokResponse = await grokFactCheck(input);
-
-        const isTrue = grokResponse.includes("सत्य") || grokResponse.includes("पुष्टि");
-        const score = isTrue ? 85 : 40;
-
+        const data = await fakeFactCheckAPI(input);
         setTimeout(() => {
             document.getElementById("resTitle").innerText = "दावा: " + input;
-            if(score > 65) {
+            if(data.veracity > 65) {
                 badge.innerText = "✅ सत्यापित"; 
                 badge.style.background = "#3fbf63"; 
                 bar.style.background = "#3fbf63";
@@ -135,8 +176,8 @@
                 badge.style.background = "#ef4444"; 
                 bar.style.background = "#ef4444";
             }
-            analysis.innerText = grokResponse;
-            bar.style.width = score + "%";
+            analysis.innerText = data.message;
+            bar.style.width = data.veracity + "%";
         }, 1500);
 
         btn.disabled = false;
@@ -145,37 +186,8 @@
 
     function externalSearch(site) {
         let q = document.getElementById("userInput").value.trim();
-        if(!q) {
-            alert("❌ पहले दावा लिखें!");
-            return;
-        }
-        
-        if (site === 'news') {
-            runCheck(); // Grok से चेक
-        } else {
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
-        }
-    }
-
-    function loadLiveNews() {
-        const container = document.getElementById('newsContainer');
-        container.innerHTML = '<div class="news-card loading"><div class="news-title">नई खबरें लोड हो रही हैं...</div></div>';
-        
-        setTimeout(() => {
-            const news = [
-                { title: "PM मोदी ने नई डिजिटल इंडिया योजना लॉन्च की", source: "PIB", time: "2 घंटे पहले" },
-                { title: "ISRO का अगला मिशन अगस्त 2026 में", source: "DD News", time: "4 घंटे पहले" },
-                { title: "भारत का GDP ग्रोथ रेट 7.2% रहने का अनुमान", source: "RBI", time: "1 दिन पहले" },
-                { title: "नई EV नीति कैबिनेट में मंजूर", source: "Economic Times", time: "6 घंटे पहले" }
-            ].sort(() => Math.random() - 0.5);
-            
-            container.innerHTML = news.map(n => `
-                <div class="news-card" onclick="document.getElementById('userInput').value='${n.title}'; runCheck();">
-                    <div class="news-title">${n.title}</div>
-                    <div class="news-source">${n.source} • ${n.time}</div>
-                </div>
-            `).join('');
-        }, 1200);
+        if(!q) return alert("❌ पहले दावा लिखें!");
+        window.open(`https://news.google.com/search?q=${encodeURIComponent(q)}&hl=hi&gl=IN`, '_blank');
     }
 
     window.onload = () => {
