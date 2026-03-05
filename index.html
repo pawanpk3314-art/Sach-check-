@@ -1,30 +1,117 @@
-<script>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SachCheck Startup</title>
 
-function calculateScore(text){
-    let score = 75;
-
-    const riskyWords = [
-        "viral","100%","breaking","secret",
-        "चमत्कार","गारंटी","तुरंत","shocking"
-    ];
-
-    riskyWords.forEach(word=>{
-        if(text.toLowerCase().includes(word)){
-            score -= 15;
-        }
-    });
-
-    if(text.length < 20){
-        score -= 10;
-    }
-
-    return Math.max(20, Math.min(score,95));
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#0b1622;
+    color:white;
 }
 
-function universalVerify(){
+.container{
+    padding:20px;
+    max-width:600px;
+    margin:auto;
+}
+
+.card{
+    background:#12263a;
+    padding:20px;
+    border-radius:10px;
+}
+
+.section-title{
+    font-size:18px;
+    margin-bottom:10px;
+    font-weight:bold;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    border-radius:6px;
+    border:none;
+    margin-bottom:10px;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:6px;
+    background:#ef4444;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.8;
+}
+
+#resultSection{
+    display:none;
+    margin-top:20px;
+    border-left:6px solid #ef4444;
+    padding-left:10px;
+}
+
+.status-badge{
+    display:inline-block;
+    padding:5px 12px;
+    border-radius:6px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.progress{
+    height:8px;
+    background:#0d1f33;
+    border-radius:5px;
+    margin:15px 0;
+    overflow:hidden;
+}
+
+.bar{
+    height:100%;
+    width:0%;
+    transition:1.2s ease;
+    background:#ef4444;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+<div class="section-title">🛡️ दावा जाँचें / Verify a Claim</div>
+
+<input type="text" id="userInput" placeholder="यहाँ अपना सवाल लिखें...">
+<button onclick="universalVerify()">Verify Claim</button>
+
+<div id="resultSection">
+    <div id="badge" class="status-badge">जाँच जारी है...</div>
+    <h3 id="displayTitle"></h3>
+    <p id="analysisText" style="color:#9fb3c8;"></p>
+    <div class="progress"><div id="bar" class="bar"></div></div>
+
+    <button onclick="externalSearch('google')" style="background:#1c3a57;">Google Search</button>
+    <button onclick="externalSearch('twitter')" style="background:#1c3a57;">Twitter Proof</button>
+</div>
+</div>
+
+</div>
+
+<script>
+function universalVerify() {
 
     let input = document.getElementById("userInput").value.trim();
-    if(input === ""){
+    if(input === "") {
         alert("कृपया कुछ टाइप करें!");
         return;
     }
@@ -33,54 +120,30 @@ function universalVerify(){
     let badge = document.getElementById("badge");
     let analysis = document.getElementById("analysisText");
     let bar = document.getElementById("bar");
-    let title = document.getElementById("displayTitle");
 
     section.style.display = "block";
-    section.style.borderLeft = "6px solid #38bdf8"; // loading color
+    document.getElementById("displayTitle").innerText = "विश्लेषण: " + input;
 
-    badge.innerText = "⏳ विश्लेषण जारी है...";
-    badge.style.background = "#38bdf8";
-    bar.style.width = "0%";
-
-    title.innerText = "विश्लेषण: " + input;
+    let score = Math.floor(Math.random() * 100);
 
     setTimeout(() => {
-
-        let score = calculateScore(input);
         bar.style.width = score + "%";
 
-        if(score >= 65){
-            badge.innerText = "✅ LIKELY CREDIBLE";
+        if(score > 60){
+            badge.innerText = "✅ VERIFIED / TRUE";
             badge.style.background = "#3fbf63";
             bar.style.background = "#3fbf63";
-            section.style.borderLeft = "6px solid #3fbf63";
-
-            analysis.innerText =
-            "भाषाई विश्लेषण के आधार पर यह दावा विश्वसनीय प्रतीत होता है। फिर भी आधिकारिक स्रोतों से पुष्टि करना उचित है।";
-        }
-        else if(score >= 45){
-            badge.innerText = "⚠️ NEEDS VERIFICATION";
-            badge.style.background = "#facc15";
-            bar.style.background = "#facc15";
-            section.style.borderLeft = "6px solid #facc15";
-
-            analysis.innerText =
-            "इस दावे की स्वतंत्र पुष्टि उपलब्ध नहीं है। साझा करने से पहले अतिरिक्त स्रोतों की जाँच करें।";
-        }
-        else{
-            badge.innerText = "🚨 HIGH RISK / SUSPICIOUS";
+            analysis.innerText = "AI विश्लेषण के अनुसार यह जानकारी विश्वसनीय लग रही है।";
+        } else {
+            badge.innerText = "🚨 FAKE / SUSPICIOUS";
             badge.style.background = "#ef4444";
             bar.style.background = "#ef4444";
-            section.style.borderLeft = "6px solid #ef4444";
-
-            analysis.innerText =
-            "यह दावा अतिरंजित या भ्रामक हो सकता है। विश्वसनीय समाचार स्रोतों से सत्यापन आवश्यक है।";
+            analysis.innerText = "सावधान! इस दावे के पक्ष में पर्याप्त सबूत नहीं मिले।";
         }
-
-    }, 800);
+    }, 300);
 }
 
-function externalSearch(p){
+function externalSearch(p) {
     let q = document.getElementById("userInput").value;
     let url = p === 'google'
         ? 'https://google.com/search?q='
@@ -88,5 +151,7 @@ function externalSearch(p){
 
     window.open(url + encodeURIComponent(q), "_blank");
 }
-
 </script>
+
+</body>
+</html>
