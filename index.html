@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SachCheck Startup</title>
+<title>SachCheck</title>
 
 <style>
 body{
@@ -13,145 +13,140 @@ body{
     color:white;
 }
 
+/* Navbar */
+.navbar{
+    background:#142a44;
+    padding:15px 20px;
+    font-size:20px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
 .container{
     padding:20px;
     max-width:600px;
     margin:auto;
 }
 
+/* Verify Card */
 .card{
-    background:#12263a;
+    background:#142a44;
     padding:20px;
+    border-radius:18px;
+    position:relative;
+    box-shadow:0 5px 20px rgba(0,0,0,0.3);
+}
+
+.card::before{
+    content:"";
+    position:absolute;
+    left:-6px;
+    top:0;
+    bottom:0;
+    width:6px;
+    background:#4ade80;
     border-radius:10px;
 }
 
 .section-title{
     font-size:18px;
-    margin-bottom:10px;
-    font-weight:bold;
+    margin-bottom:15px;
+    color:#4ade80;
 }
 
 input{
     width:100%;
-    padding:10px;
-    border-radius:6px;
+    padding:14px;
+    border-radius:8px;
     border:none;
-    margin-bottom:10px;
+    background:#0f2236;
+    color:white;
+    font-size:15px;
+    margin-bottom:15px;
 }
 
 button{
-    padding:10px 15px;
+    width:100%;
+    padding:14px;
     border:none;
-    border-radius:6px;
-    background:#ef4444;
+    border-radius:10px;
+    background:#4ade80;
     color:white;
+    font-size:16px;
+    font-weight:bold;
     cursor:pointer;
 }
 
 button:hover{
-    opacity:0.8;
+    opacity:0.9;
 }
 
-#resultSection{
-    display:none;
-    margin-top:20px;
-    border-left:6px solid #ef4444;
-    padding-left:10px;
+/* News Section */
+.news-title{
+    margin-top:30px;
+    font-size:20px;
+    color:#38bdf8;
 }
 
-.status-badge{
-    display:inline-block;
-    padding:5px 12px;
-    border-radius:6px;
-    font-weight:bold;
-    margin-bottom:10px;
-}
-
-.progress{
-    height:8px;
-    background:#0d1f33;
-    border-radius:5px;
-    margin:15px 0;
+.news-card{
+    margin-top:15px;
+    background:#142a44;
+    border-radius:20px;
     overflow:hidden;
+    box-shadow:0 5px 20px rgba(0,0,0,0.4);
 }
 
-.bar{
-    height:100%;
-    width:0%;
-    transition:1.2s ease;
-    background:#ef4444;
+.news-card img{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+}
+
+.news-content{
+    padding:15px;
+}
+
+.news-content h3{
+    margin:0;
+    font-size:18px;
+}
+
+.source{
+    margin-top:8px;
+    color:#60a5fa;
+    font-size:14px;
 }
 </style>
 </head>
 
 <body>
 
+<div class="navbar">
+🛡️ SachCheck
+</div>
+
 <div class="container">
 
 <div class="card">
-<div class="section-title">🛡️ दावा जाँचें / Verify a Claim</div>
+<div class="section-title">📅 दावा जाँचें / Verify a Claim</div>
 
-<input type="text" id="userInput" placeholder="यहाँ अपना सवाल लिखें...">
-<button onclick="universalVerify()">Verify Claim</button>
+<input type="text" placeholder="यहाँ अपना सवाल लिखें...">
+<button>🛡️ Verify Claim</button>
+</div>
 
-<div id="resultSection">
-    <div id="badge" class="status-badge">जाँच जारी है...</div>
-    <h3 id="displayTitle"></h3>
-    <p id="analysisText" style="color:#9fb3c8;"></p>
-    <div class="progress"><div id="bar" class="bar"></div></div>
+<div class="news-title">📰 ताज़ा समाचार / Latest News</div>
 
-    <button onclick="externalSearch('google')" style="background:#1c3a57;">Google Search</button>
-    <button onclick="externalSearch('twitter')" style="background:#1c3a57;">Twitter Proof</button>
+<div class="news-card">
+<img src="https://images.unsplash.com/photo-1518770660439-4636190af475">
+<div class="news-content">
+<h3>Intel CEO Lip-Bu Tan: I was shocked to find China's Huawei...</h3>
+<div class="source">Times of India</div>
 </div>
 </div>
 
 </div>
-
-<script>
-function universalVerify() {
-
-    let input = document.getElementById("userInput").value.trim();
-    if(input === "") {
-        alert("कृपया कुछ टाइप करें!");
-        return;
-    }
-
-    let section = document.getElementById("resultSection");
-    let badge = document.getElementById("badge");
-    let analysis = document.getElementById("analysisText");
-    let bar = document.getElementById("bar");
-
-    section.style.display = "block";
-    document.getElementById("displayTitle").innerText = "विश्लेषण: " + input;
-
-    let score = Math.floor(Math.random() * 100);
-
-    setTimeout(() => {
-        bar.style.width = score + "%";
-
-        if(score > 60){
-            badge.innerText = "✅ VERIFIED / TRUE";
-            badge.style.background = "#3fbf63";
-            bar.style.background = "#3fbf63";
-            analysis.innerText = "AI विश्लेषण के अनुसार यह जानकारी विश्वसनीय लग रही है।";
-        } else {
-            badge.innerText = "🚨 FAKE / SUSPICIOUS";
-            badge.style.background = "#ef4444";
-            bar.style.background = "#ef4444";
-            analysis.innerText = "सावधान! इस दावे के पक्ष में पर्याप्त सबूत नहीं मिले।";
-        }
-    }, 300);
-}
-
-function externalSearch(p) {
-    let q = document.getElementById("userInput").value;
-    let url = p === 'google'
-        ? 'https://google.com/search?q='
-        : 'https://twitter.com/search?q=';
-
-    window.open(url + encodeURIComponent(q), "_blank");
-}
-</script>
 
 </body>
 </html>
