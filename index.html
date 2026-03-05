@@ -1,80 +1,92 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SachCheck AI</title>
-<style>
-    :root { --bg: #0f172a; --card: #1e293b; --accent: #22c55e; --red: #ef4444; --blue: #38bdf8; }
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; padding: 15px; }
-    .header { text-align: center; padding: 20px; margin-bottom: 10px; }
-    .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #334155; }
-    input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; margin-bottom: 15px; box-sizing: border-box; }
-    button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .status-badge { display: inline-block; padding: 5px 12px; border-radius: 5px; font-weight: bold; font-size: 12px; margin-bottom: 10px; }
-    .fake { background: var(--red); }
-    .true { background: var(--accent); }
-    .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-    .ev-link { background: #2d3748; border-radius: 8px; text-decoration: none; color: white; text-align: center; border: 1px solid #4a5568; overflow: hidden; }
-    .ev-img { width: 100%; height: 60px; object-fit: cover; background: #1a202c; }
-    .ev-label { padding: 8px; font-size: 11px; font-weight: bold; }
-    #resultSection { display: none; }
-</style>
-</head>
-<body>
-
-<div class="header">
-    <h1>🛡️ SachCheck</h1>
-    <p style="font-size: 14px; color: #94a3b8;">AI Fact Verification Platform</p>
-</div>
-
-<div class="card">
-    <h3 style="margin-top: 0; font-size: 16px; color: var(--accent);">📅 दावा जाँचें / Verify a Claim</h3>
-    <input type="text" id="claimInput" placeholder="यहाँ अपना सवाल लिखें...">
-    <button onclick="checkFact()">🛡️ Verify Claim</button>
-</div>
-
-<div id="resultSection" class="card" style="border-left: 5px solid var(--red);">
-    <div class="status-badge fake">🚨 FAKE / MISLEADING</div>
-    <h2 id="displayTitle" style="margin: 10px 0; font-size: 22px;">विश्लेषण रिपोर्ट</h2>
-    <p id="analysisText" style="color: #cbd5e1; font-size: 14px; line-height: 1.6;"></p>
-    
-    <div class="evidence-grid">
-        <a id="link1" target="_blank" class="ev-link">
-            <div class="ev-img" style="background: url('https://www.thehindu.com/favicon.ico') center no-repeat;"></div>
-            <div class="ev-label">The Hindu (सबूत देखें)</div>
-        </a>
-        <a href="https://twitter.com/PIBFactCheck" target="_blank" class="ev-link">
-            <img class="ev-img" src="https://logo.clearbit.com/twitter.com">
-            <div class="ev-label">PIB Check (Twitter)</div>
-        </a>
-    </div>
-    <button onclick="location.reload()" style="background: #2d3748; margin-top: 20px;">नई जाँच शुरू करें</button>
-</div>
-
 <script>
-function checkFact() {
-    let input = document.getElementById("claimInput").value.trim();
-    if (input === "") { alert("कृपया कुछ टाइप करें!"); return; }
 
-    let result = document.getElementById("resultSection");
-    let analysis = document.getElementById("analysisText");
-    let hinduLink = document.getElementById("link1");
+function calculateScore(text){
+    let score = 75;
 
-    result.style.display = "block";
-    window.scrollTo(0, document.body.scrollHeight);
+    const riskyWords = [
+        "viral","100%","breaking","secret",
+        "चमत्कार","गारंटी","तुरंत","shocking"
+    ];
 
-    // अगर यूजर 'मोदी' या 'डिग्री' से जुड़ा कुछ लिखता है
-    if (input.includes("मोदी") || input.includes("डिग्री")) {
-        analysis.innerHTML = "यह दावा <b>भ्रामक</b> पाया गया है। गुजरात हाई कोर्ट ने स्पष्ट किया कि प्रधानमंत्री की डिग्री सार्वजनिक करना कानूनी रूप से अनिवार्य नहीं है। नीचे दिए गए आधिकारिक स्रोतों में सबूत देखें।";
-        // सही किया हुआ लिंक
-        hinduLink.href = "https://www.thehindu.com/news/national/gujarat-hc-sets-aside-cic-order-to-gu-to-provide-info-on-pm-modis-degree/article66683526.ece#:~:text=The%20Gujarat%20High%20Court%20on%20Friday%20set%20aside%20an%20order";
-    } else {
-        analysis.innerText = "इस दावे की पुष्टि के लिए अभी पर्याप्त डेटा उपलब्ध नहीं है, लेकिन प्रारंभिक जांच में यह संदिग्ध लग रहा है।";
-        hinduLink.href = "https://www.thehindu.com/";
+    riskyWords.forEach(word=>{
+        if(text.toLowerCase().includes(word)){
+            score -= 15;
+        }
+    });
+
+    if(text.length < 20){
+        score -= 10;
     }
-}
-</script>
 
-</body>
-</html>
+    return Math.max(20, Math.min(score,95));
+}
+
+function universalVerify(){
+
+    let input = document.getElementById("userInput").value.trim();
+    if(input === ""){
+        alert("कृपया कुछ टाइप करें!");
+        return;
+    }
+
+    let section = document.getElementById("resultSection");
+    let badge = document.getElementById("badge");
+    let analysis = document.getElementById("analysisText");
+    let bar = document.getElementById("bar");
+    let title = document.getElementById("displayTitle");
+
+    section.style.display = "block";
+    section.style.borderLeft = "6px solid #38bdf8"; // loading color
+
+    badge.innerText = "⏳ विश्लेषण जारी है...";
+    badge.style.background = "#38bdf8";
+    bar.style.width = "0%";
+
+    title.innerText = "विश्लेषण: " + input;
+
+    setTimeout(() => {
+
+        let score = calculateScore(input);
+        bar.style.width = score + "%";
+
+        if(score >= 65){
+            badge.innerText = "✅ LIKELY CREDIBLE";
+            badge.style.background = "#3fbf63";
+            bar.style.background = "#3fbf63";
+            section.style.borderLeft = "6px solid #3fbf63";
+
+            analysis.innerText =
+            "भाषाई विश्लेषण के आधार पर यह दावा विश्वसनीय प्रतीत होता है। फिर भी आधिकारिक स्रोतों से पुष्टि करना उचित है।";
+        }
+        else if(score >= 45){
+            badge.innerText = "⚠️ NEEDS VERIFICATION";
+            badge.style.background = "#facc15";
+            bar.style.background = "#facc15";
+            section.style.borderLeft = "6px solid #facc15";
+
+            analysis.innerText =
+            "इस दावे की स्वतंत्र पुष्टि उपलब्ध नहीं है। साझा करने से पहले अतिरिक्त स्रोतों की जाँच करें।";
+        }
+        else{
+            badge.innerText = "🚨 HIGH RISK / SUSPICIOUS";
+            badge.style.background = "#ef4444";
+            bar.style.background = "#ef4444";
+            section.style.borderLeft = "6px solid #ef4444";
+
+            analysis.innerText =
+            "यह दावा अतिरंजित या भ्रामक हो सकता है। विश्वसनीय समाचार स्रोतों से सत्यापन आवश्यक है।";
+        }
+
+    }, 800);
+}
+
+function externalSearch(p){
+    let q = document.getElementById("userInput").value;
+    let url = p === 'google'
+        ? 'https://google.com/search?q='
+        : 'https://twitter.com/search?q=';
+
+    window.open(url + encodeURIComponent(q), "_blank");
+}
+
+</script>
