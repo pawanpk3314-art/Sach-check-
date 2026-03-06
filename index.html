@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 🔥 PWA के लिए जरूरी tags 🔥 -->
     <title>SachCheck AI - फेक न्यूज़ चेकर</title>
+    <meta name="theme-color" content="#3fbf63">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#0a1428">
+    <meta name="apple-mobile-web-app-title" content="SachCheck AI">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU2FjaENoZWNrIEFJIiwi...">
+    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...">
+    
     <style>
         :root {
             --bg: #0a1428;
@@ -16,9 +24,27 @@
             background: var(--bg); 
             color: white; 
             line-height: 1.6;
+            margin: 0;
+            height: 100vh;
+            overflow-x: hidden;
         }
         
-        /* Simple Hero */
+        /* 🔥 Install Prompt के लिए 🔥 */
+        .install-banner {
+            position: fixed; top: 0; left: 0; width: 100%; 
+            background: linear-gradient(135deg, var(--accent), #63d28c);
+            color: white; padding: 15px; text-align: center; z-index: 1000;
+            transform: translateY(-100%); transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(63,191,99,0.4);
+        }
+        .install-banner.show { transform: translateY(0); }
+        .install-btn { 
+            background: rgba(255,255,255,0.2); border: 2px solid white; 
+            padding: 8px 20px; border-radius: 25px; color: white; 
+            font-weight: 700; cursor: pointer; margin-left: 15px;
+        }
+        
+        /* Hero - वैसा ही रखा */
         .hero {
             height: 80vh;
             background: linear-gradient(135deg, #0a1428 0%, #1a2a4a 100%);
@@ -29,7 +55,8 @@
             text-align: center;
             padding: 0 20px;
         }
-        .logo { font-size: 4rem; margin-bottom: 20px; }
+        .logo { font-size: 4rem; margin-bottom: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         .hero h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 900; margin-bottom: 15px; }
         .hero-badge { margin: 20px 0; }
         .hero-badge span { 
@@ -47,10 +74,8 @@
         }
         .section-title { font-size: 28px; font-weight: 800; margin-bottom: 30px; color: var(--accent); text-align: center; }
         
-        /* 🔥 Single Input - Text + Photo दोनों 🔥 */
-        .mega-input {
-            position: relative; width: 100%; margin-bottom: 25px;
-        }
+        /* Mega Input - वैसा ही */
+        .mega-input { position: relative; width: 100%; margin-bottom: 25px; }
         #userInput {
             width: 100%; padding: 22px 50px 22px 20px; border-radius: 20px; 
             border: 3px dashed var(--accent); background: #0d1f33; 
@@ -113,7 +138,14 @@
     </style>
 </head>
 <body>
-    <!-- 🔥 Single Page - Hero + Input + News सब एक साथ 🔥 -->
+    <!-- 🔥 PWA Install Banner 🔥 -->
+    <div class="install-banner" id="installBanner">
+        <strong>📱 SachCheck AI को Home screen पर install करें!</strong>
+        <button class="install-btn" id="installBtn">Install</button>
+        <button class="install-btn" onclick="dismissInstall()" style="background:none;">❌</button>
+    </div>
+
+    <!-- सब वैसा ही content -->
     <section class="hero">
         <div class="logo">🛡️</div>
         <h1>Sach<span style="color: var(--accent);">Check</span> AI</h1>
@@ -124,7 +156,6 @@
     </section>
 
     <div class="container">
-        <!-- 🔥 Mega Input (Text + Photo एक साथ) 🔥 -->
         <div class="card">
             <h2 class="section-title">📝 दावा जांचें</h2>
             <div class="mega-input">
@@ -141,7 +172,6 @@
             <div id="resultBox"></div>
         </div>
 
-        <!-- 🔥 Latest News (नीचे scroll पर) 🔥 -->
         <div class="card">
             <h2 class="section-title">📰 ताज़ा खबरें</h2>
             <div class="news-grid">
@@ -161,10 +191,41 @@
         </div>
     </div>
 
+    <!-- 🔥 PWA Service Worker + Install Script 🔥 -->
     <script>
         let uploadedFile = null;
+        let deferredPrompt;
 
-        // 🔥 Text input पर click → photo भी खुलेगा 🔥
+        // PWA Install Prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').classList.add('show');
+        });
+
+        document.getElementById('installBtn').onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                document.getElementById('installBanner').classList.remove('show');
+            }
+        };
+
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('installBanner').classList.remove('show');
+        });
+
+        function dismissInstall() {
+            document.getElementById('installBanner').classList.remove('show');
+        }
+
+        // Offline Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,...');
+        }
+
+        // File Upload - वैसा ही
         document.getElementById('fileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -182,7 +243,6 @@
                 return;
             }
 
-            // Progress animation
             const progress = document.getElementById('progress');
             const bar = document.getElementById('progressBar');
             progress.style.display = 'block';
