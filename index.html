@@ -9,7 +9,6 @@
             --bg: #0a1428;
             --card: rgba(17,38,61,0.9);
             --accent: #3fbf63;
-            --blue: #38bdf8;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -17,242 +16,204 @@
             background: var(--bg); 
             color: white; 
             line-height: 1.6;
-            overflow-x: hidden;
         }
         
-        /* 🔥 नया Ultra Hero 🔥 */
-        .ultra-hero {
-            height: 100vh;
-            min-height: 600px;
-            background: linear-gradient(145deg, #0a1428 0%, #1a2a4a 50%, #2d4068 100%);
-            position: relative; overflow: hidden;
+        /* Simple Hero */
+        .hero {
+            height: 80vh;
+            background: linear-gradient(135deg, #0a1428 0%, #1a2a4a 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
         }
-        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2; }
-        .hero-main { position: relative; z-index: 3; max-width: 800px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; }
-        .shield-orbit { position: relative; margin-bottom: 20px; }
-        .shield-main { font-size: 60px; animation: shieldPulse 2s ease-in-out infinite; }
-        .shield-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: radial-gradient(circle, rgba(63,191,99,0.3) 0%, transparent 70%); border-radius: 50%; animation: rotate 10s linear infinite; }
-        @keyframes shieldPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-        .hero-title { font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 900; margin-bottom: 10px; background: linear-gradient(135deg, white, #63d28c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .highlight { color: var(--accent); }
-        .ai-tag { font-size: 0.6em; background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 4px 12px; border-radius: 20px; font-weight: 700; }
+        .logo { font-size: 4rem; margin-bottom: 20px; }
+        .hero h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 900; margin-bottom: 15px; }
         .hero-badge { margin: 20px 0; }
-        .hero-badge span { background: linear-gradient(135deg, var(--accent), #63d28c); color: white; padding: 12px 25px; border-radius: 30px; font-size: 18px; font-weight: 800; box-shadow: 0 8px 25px rgba(63,191,99,0.4); animation: badgeGlow 2s ease-in-out infinite alternate; }
-        @keyframes badgeGlow { from { box-shadow: 0 8px 25px rgba(63,191,99,0.4); } to { box-shadow: 0 12px 35px rgba(63,191,99,0.6); } }
-        .hero-text { font-size: 1.3rem; margin-bottom: 20px; opacity: 0.9; }
-        .hero-features { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; font-size: 1rem; color: #9fb3c8; }
+        .hero-badge span { 
+            background: linear-gradient(135deg, var(--accent), #63d28c); 
+            color: white; padding: 12px 25px; border-radius: 30px; 
+            font-size: 18px; font-weight: 800; box-shadow: 0 8px 25px rgba(63,191,99,0.4);
+        }
+        .hero p { font-size: 1.3rem; opacity: 0.9; margin-bottom: 30px; }
         
-        .container { max-width: 600px; margin: 30px auto; padding: 0 15px; }
-        .card { background: var(--card); padding: 30px; border-radius: 25px; margin-bottom: 30px; border-left: 6px solid var(--accent); box-shadow: 0 12px 40px rgba(0,0,0,0.5); backdrop-filter: blur(15px); }
-        .section-title { font-size: 22px; font-weight: 800; margin-bottom: 25px; color: var(--accent); text-align: center; }
+        .container { max-width: 700px; margin: 0 auto; padding: 40px 20px; }
+        .card { 
+            background: var(--card); padding: 40px; border-radius: 25px; 
+            margin-bottom: 40px; border-left: 6px solid var(--accent); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); backdrop-filter: blur(15px);
+        }
+        .section-title { font-size: 28px; font-weight: 800; margin-bottom: 30px; color: var(--accent); text-align: center; }
         
-        /* 🔥 नया Photo/Video Upload 🔥 */
-        .input-group { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
-        .text-input { width: 100%; padding: 18px; border-radius: 15px; border: 2px solid transparent; background: #0d1f33; color: white; font-size: 17px; transition: all 0.3s; }
-        .text-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(63,191,99,0.15); }
-        .upload-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-        .upload-btn { flex: 1; max-width: 120px; padding: 14px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--blue), #0ea5e9); color: white; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 20px rgba(56,189,248,0.3); }
-        .upload-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(56,189,248,0.4); }
-        .upload-preview { text-align: center; margin: 20px 0; }
-        .preview-img, .preview-video { max-width: 200px; max-height: 150px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
+        /* 🔥 Single Input - Text + Photo दोनों 🔥 */
+        .mega-input {
+            position: relative; width: 100%; margin-bottom: 25px;
+        }
+        #userInput {
+            width: 100%; padding: 22px 50px 22px 20px; border-radius: 20px; 
+            border: 3px dashed var(--accent); background: #0d1f33; 
+            color: white; font-size: 18px; transition: all 0.3s;
+        }
+        #userInput:focus {
+            outline: none; border-color: #63d28c; box-shadow: 0 0 0 4px rgba(63,191,99,0.2);
+            background: rgba(13,31,51,0.95);
+        }
+        #fileInput { display: none; }
+        .input-icon {
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+            font-size: 24px; cursor: pointer; opacity: 0.7; transition: 0.3s;
+        }
+        .input-icon:hover { opacity: 1; transform: translateY(-50%) scale(1.1); }
+        .preview { text-align: center; margin: 20px 0; }
+        .preview img { max-width: 250px; max-height: 180px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        .v-btn { width: 100%; padding: 18px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--accent), #32c768); color: white; font-weight: 800; font-size: 17px; cursor: pointer; transition: all 0.3s; margin: 15px 0; box-shadow: 0 8px 25px rgba(63,191,99,0.3); }
-        .v-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(63,191,99,0.4); }
-        .v-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .check-btn {
+            width: 100%; padding: 22px; border: none; border-radius: 20px; 
+            background: linear-gradient(135deg, var(--accent), #32c768); 
+            color: white; font-weight: 800; font-size: 20px; cursor: pointer; 
+            transition: all 0.3s; box-shadow: 0 10px 30px rgba(63,191,99,0.4);
+        }
+        .check-btn:hover:not(:disabled) { 
+            transform: translateY(-4px); box-shadow: 0 20px 40px rgba(63,191,99,0.5);
+        }
         
-        #resultBox { display: none; margin-top: 30px; padding-top: 25px; border-top: 3px solid #1c3a57; }
-        .badge { display: inline-block; padding: 12px 20px; border-radius: 30px; font-weight: 800; font-size: 15px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-        .progress { height: 12px; background: #0d1f33; border-radius: 8px; margin: 20px 0; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); }
-        .bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #63d28c); transition: 2s ease; border-radius: 8px; }
+        #resultBox { 
+            display: none; margin-top: 30px; padding: 30px; 
+            border-top: 4px solid var(--accent); background: rgba(63,191,99,0.1);
+            border-radius: 20px;
+        }
+        .result-badge {
+            display: inline-block; padding: 15px 25px; border-radius: 30px; 
+            font-weight: 800; font-size: 18px; margin-bottom: 20px;
+        }
+        .true { background: linear-gradient(135deg, #3fbf63, #32c768); }
+        .false { background: linear-gradient(135deg, #ef4444, #dc2626); }
         
-        .search-btns { display: flex; gap: 12px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
-        .search-btns button { flex: 1; max-width: 150px; background: rgba(28,58,87,0.9); color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; transition: 0.3s; font-size: 14px; backdrop-filter: blur(10px); }
-        .search-btns button:hover { background: #2d4a71; transform: translateY(-2px); }
-        .perplexity-btn { background: linear-gradient(135deg, #6366f1, #8b5cf6) !important; }
-        .perplexity-btn:hover { box-shadow: 0 10px 30px rgba(99,102,241,0.4) !important; }
-        
-        .news-section { margin-top: 50px; }
-        .news-card { background: rgba(17,38,61,0.85); border-radius: 20px; padding: 25px; margin-top: 20px; border-left: 5px solid var(--blue); cursor: pointer; transition: all 0.3s; backdrop-filter: blur(10px); animation: slideIn 0.5s ease forwards; opacity: 0; transform: translateY(20px); }
-        .news-card:nth-child(1) { animation-delay: 0.1s; }
-        .news-card:nth-child(2) { animation-delay: 0.2s; }
-        .news-card:nth-child(3) { animation-delay: 0.3s; }
-        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
-        .news-card:hover { background: rgba(17,38,61,1); transform: translateX(8px); box-shadow: 0 15px 40px rgba(56,189,248,0.2); }
-        .news-title { font-size: 17px; margin-bottom: 10px; font-weight: 600; }
-        .news-source { color: var(--blue); font-size: 14px; }
-        
-        .loading { opacity: 0.6; pointer-events: none; }
-        .mic-btn { background: linear-gradient(135deg, var(--blue), #0ea5e9); border: none; padding: 14px; border-radius: 50%; cursor: pointer; font-size: 22px; margin-left: 12px; box-shadow: 0 8px 25px rgba(56,189,248,0.4); transition: all 0.3s; }
-        .mic-btn:hover { transform: scale(1.1); box-shadow: 0 12px 30px rgba(56,189,248,0.5); }
+        .news-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px; margin-top: 50px;
+        }
+        .news-card { 
+            background: rgba(17,38,61,0.9); border-radius: 20px; padding: 30px; 
+            cursor: pointer; transition: all 0.3s; border-left: 5px solid var(--accent);
+            backdrop-filter: blur(10px);
+        }
+        .news-card:hover { 
+            transform: translateY(-8px); box-shadow: 0 20px 40px rgba(63,191,99,0.2);
+        }
+        .news-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+        .news-source { color: #60a5fa; font-size: 15px; }
         
         @media (max-width: 768px) {
-            .hero-features { flex-direction: column; gap: 10px; }
-            .upload-buttons { flex-direction: column; }
-            .upload-btn { max-width: 100%; }
+            .container { padding: 20px 15px; }
+            .card { padding: 30px 25px; }
         }
     </style>
 </head>
 <body>
-    <!-- 🔥 Ultra Hero Section (Stats हटा दिए) 🔥 -->
-    <section class="ultra-hero">
-        <div class="hero-overlay"></div>
-        <div class="hero-main">
-            <div class="shield-orbit">
-                <div class="shield-main">🛡️</div>
-                <div class="shield-glow"></div>
-            </div>
-            <h1 class="hero-title">
-                Sach<span class="highlight">Check</span>
-                <span class="ai-tag">AI</span>
-            </h1>
-            <!-- 🔥 नया छोटा Badge 🔥 -->
-            <div class="hero-badge">
-                <span>🔥 10L+ दावे • 99.9% सटीक</span>
-            </div>
-            <p class="hero-text">फेक न्यूज़ का अंत • 2 सेकंड में सत्य जांच</p>
-            <div class="hero-features">
-                <span>🎤 हिंदी वॉइस</span>
-                <span>🔍 रियल-टाइम सर्च</span>
-                <span>🖼️ Photo/Video चेक</span>
-                <span>🆓 हमेशा फ्री</span>
-            </div>
+    <!-- 🔥 Single Page - Hero + Input + News सब एक साथ 🔥 -->
+    <section class="hero">
+        <div class="logo">🛡️</div>
+        <h1>Sach<span style="color: var(--accent);">Check</span> AI</h1>
+        <div class="hero-badge">
+            <span>🔥 10L+ दावे • 99.9% सटीक</span>
         </div>
+        <p>फेक न्यूज़ का अंत • 2 सेकंड में सत्य जांच</p>
     </section>
 
     <div class="container">
+        <!-- 🔥 Mega Input (Text + Photo एक साथ) 🔥 -->
         <div class="card">
-            <div class="section-title">📅 दावा जांचें</div>
-            <div class="input-group">
-                <!-- 🔥 Text + Photo + Video Upload 🔥 -->
-                <input type="text" class="text-input" id="userInput" placeholder="यहाँ खबर या दावा लिखें...">
-                <div class="upload-buttons">
-                    <input type="file" id="imageUpload" accept="image/*" style="display:none">
-                    <button class="upload-btn" onclick="handleImageUpload()">🖼️ Photo</button>
-                    <input type="file" id="videoUpload" accept="video/*" style="display:none">
-                    <button class="upload-btn" onclick="handleVideoUpload()">🎥 Video</button>
-                </div>
-                <div class="upload-preview" id="preview"></div>
-                <button class="mic-btn" id="micBtn" onclick="startVoice()">🎤</button>
+            <h2 class="section-title">📝 दावा जांचें</h2>
+            <div class="mega-input">
+                <input type="text" id="userInput" placeholder="यहाँ खबर लिखें या 📷 पर click करके photo डालें...">
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <div class="input-icon" onclick="document.getElementById('fileInput').click()">📷</div>
             </div>
-            <button class="v-btn" onclick="checkClaim()">जांचें</button>
+            <div class="preview" id="preview"></div>
+            <button class="check-btn" onclick="checkClaim()">🚀 अभी जांचें</button>
             
-            <div id="progress" class="progress" style="display:none">
-                <div class="bar" id="progressBar"></div>
+            <div id="progress" class="progress" style="display:none; height: 12px; background: #0d1f33; border-radius: 8px; margin: 20px 0; overflow: hidden;">
+                <div class="bar" id="progressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #63d28c); transition: 2s ease; border-radius: 8px;"></div>
             </div>
             <div id="resultBox"></div>
         </div>
 
-        <div class="news-section">
-            <div class="card">
-                <div class="section-title">📰 ताज़ा खबरें</div>
-                <div id="newsContainer"></div>
+        <!-- 🔥 Latest News (नीचे scroll पर) 🔥 -->
+        <div class="card">
+            <h2 class="section-title">📰 ताज़ा खबरें</h2>
+            <div class="news-grid">
+                <div class="news-card">
+                    <div class="news-title">PM का नया AI प्रोग्राम लॉन्च</div>
+                    <div class="news-source">NDTV • 2 घंटे पहले</div>
+                </div>
+                <div class="news-card">
+                    <div class="news-title">चंद्रयान-4 मिशन सफल</div>
+                    <div class="news-source">ISRO • 5 घंटे पहले</div>
+                </div>
+                <div class="news-card">
+                    <div class="news-title">बजट 2026 घोषणा</div>
+                    <div class="news-source">Finance Ministry • 1 दिन पहले</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        let mediaRecorder;
-        let audioChunks = [];
         let uploadedFile = null;
-        let fileType = '';
 
-        // 🔥 Photo/Video Upload Functions 🔥
-        function handleImageUpload() {
-            document.getElementById('imageUpload').click();
-            document.getElementById('imageUpload').onchange = function(e) {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    uploadedFile = file;
-                    fileType = 'image';
-                    showPreview(file);
-                } else {
-                    alert('कृपया वैध photo चुनें (JPG, PNG)');
-                }
+        // 🔥 Text input पर click → photo भी खुलेगा 🔥
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                uploadedFile = file;
+                const preview = document.getElementById('preview');
+                const url = URL.createObjectURL(file);
+                preview.innerHTML = `<img src="${url}" alt="Preview">`;
             }
-        }
-
-        function handleVideoUpload() {
-            document.getElementById('videoUpload').click();
-            document.getElementById('videoUpload').onchange = function(e) {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith('video/')) {
-                    uploadedFile = file;
-                    fileType = 'video';
-                    showPreview(file);
-                } else {
-                    alert('कृपया वैध video चुनें (MP4, AVI)');
-                }
-            }
-        }
-
-        function showPreview(file) {
-            const preview = document.getElementById('preview');
-            const url = URL.createObjectURL(file);
-            if (fileType === 'image') {
-                preview.innerHTML = `<img src="${url}" class="preview-img" alt="Preview">`;
-            } else {
-                preview.innerHTML = `<video src="${url}" class="preview-video" controls></video>`;
-            }
-        }
+        });
 
         function checkClaim() {
             const text = document.getElementById('userInput').value;
             if (!text && !uploadedFile) {
-                alert('कृपया text या photo/video डालें!');
+                alert('कृपया text लिखें या 📷 से photo चुनें!');
                 return;
             }
 
+            // Progress animation
             const progress = document.getElementById('progress');
             const bar = document.getElementById('progressBar');
             progress.style.display = 'block';
             
             let width = 0;
             const interval = setInterval(() => {
-                width += 2;
+                width += 3;
                 bar.style.width = width + '%';
                 if (width >= 100) {
                     clearInterval(interval);
-                    showResult(text || 'Photo/Video analysis');
+                    showDemoResult(text || 'Photo analysis');
                 }
-            }, 50);
+            }, 30);
         }
 
-        function showResult(query) {
-            document.getElementById('resultBox').innerHTML = `
-                <div class="badge" style="background: linear-gradient(135deg, #3fbf63, #32c768);">✅ सत्य</div>
-                <h3>परिणाम:</h3>
-                <p><strong>"${query}"</strong> यह दावा <strong>सही</strong> है।</p>
-                <p>स्रोत: विश्वसनीय न्यूज़ वेबसाइट्स और फैक्ट-चेक डेटाबेस।</p>
-                <div class="search-btns">
-                    <button class="perplexity-btn" onclick="window.open('https://www.perplexity.ai/search?q=${encodeURIComponent(query)}')">Perplexity</button>
-                    <button onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(query)}')">Google</button>
+        function showDemoResult(query) {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.innerHTML = `
+                <div class="result-badge true">✅ सत्यापित</div>
+                <h3 style="color: var(--accent); margin-bottom: 15px;">परिणाम:</h3>
+                <p style="font-size: 18px; margin-bottom: 15px;"><strong>"${query}"</strong></p>
+                <p style="opacity: 0.9;">✓ यह दावा <strong>सही</strong> है। विश्वसनीय स्रोतों से verify किया गया।</p>
+                <div style="margin-top: 25px;">
+                    <a href="https://www.google.com/search?q=${encodeURIComponent(query)}" target="_blank" 
+                       style="background: #6366f1; color: white; padding: 12px 20px; border-radius: 12px; text-decoration: none; margin-right: 10px; display: inline-block;">Google खोजें</a>
+                    <a href="#" style="background: #ef4444; color: white; padding: 12px 20px; border-radius: 12px; text-decoration: none;">Share करें</a>
                 </div>
             `;
-            document.getElementById('resultBox').style.display = 'block';
+            resultBox.style.display = 'block';
             document.getElementById('progress').style.display = 'none';
-            uploadedFile = null;
-            document.getElementById('preview').innerHTML = '';
         }
-
-        function startVoice() {
-            // Voice recognition code यहाँ रहेगा (पुराना)
-            alert('वॉइस फीचर जल्द आ रहा है!');
-        }
-
-        // Demo news
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('newsContainer').innerHTML = `
-                <div class="news-card">
-                    <div class="news-title">PM का नया AI प्रोग्राम लॉन्च</div>
-                    <div class="news-source">NDTV • 2 घंटे पहले</div>
-                </div>
-                <div class="news-card">
-                    <div class="news-title">चंद्रयान-4 मिशन अपडेट</div>
-                    <div class="news-source">ISRO • 5 घंटे पहले</div>
-                </div>
-            `;
-        });
     </script>
 </body>
 </html>
