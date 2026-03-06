@@ -1,0 +1,12 @@
+{
+  "name": "SachCheck AI",
+  "short_name": "SachCheck",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#3fbf63",
+  "background_color": "#0a1428",
+  "icons": [
+    {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
