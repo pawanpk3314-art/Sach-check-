@@ -219,9 +219,10 @@
             document.getElementById('installBanner').classList.remove('show');
         }
 
-        // Offline Service Worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:text/javascript;base64,...');
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js');
+          });
         }
 
         // File Upload - वैसा ही
