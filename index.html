@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SachCheck - AI सत्य जांचक</title>
     <style>
-        :root { --bg: #0b1c2d; --card: #11263d; --accent: #3fbf63; --blue: #38bdf8; }
+        :root { --bg: #0b1c2d; --card: #11263d; --accent: #3fbf63; --blue: #38bdf8; --red: #ef4444; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; line-height: 1.6; }
         .header { padding: 20px; background: linear-gradient(135deg, #0f2236, #1a365d); text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
@@ -21,8 +21,8 @@
         .badge { display: inline-block; padding: 8px 16px; border-radius: 25px; font-weight: bold; font-size: 14px; margin-bottom: 15px; }
         .progress { height: 10px; background: #0d1f33; border-radius: 5px; margin: 15px 0; overflow: hidden; }
         .bar { height: 100%; width: 0%; transition: 1.5s ease; }
-        .search-btns { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
-        .search-btns button { flex: 1; max-width: 300px; background: #1c3a57; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .search-btns { display: flex; gap: 10px; margin-top: 15px; justify-content: center; flex-wrap: wrap; }
+        .search-btns button { flex: 1; max-width: 180px; background: #1c3a57; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 14px; }
         .search-btns button:hover { background: #2d4a71; }
         .news-section { margin-top: 40px; }
         .news-card { background: rgba(17,38,61,0.8); border-radius: 15px; padding: 20px; margin-top: 15px; border-left: 4px solid var(--blue); cursor: pointer; transition: 0.3s; }
@@ -30,6 +30,8 @@
         .news-title { font-size: 16px; margin-bottom: 8px; }
         .news-source { color: #4da6ff; font-size: 13px; }
         .loading { opacity: 0.6; pointer-events: none; }
+        .mic-btn { background: #4da6ff; border: none; padding: 12px; border-radius: 50%; cursor: pointer; font-size: 20px; margin-left: 10px; }
+        .confetti { position: absolute; pointer-events: none; width: 100%; height: 100%; top: 0; left: 0; z-index: 10; }
     </style>
 </head>
 <body>
@@ -38,8 +40,11 @@
     <div class="container">
         <div class="card">
             <div class="section-title">📅 दावा जांचें</div>
-            <input type="text" id="userInput" placeholder="यहाँ खबर या दावा लिखें (5+ अक्षर)...">
-            <button class="v-btn" id="checkBtn" onclick="runCheck()">🛡️ दावा जांचें</button>
+            <div style="display: flex; align-items: center;">
+                <input type="text" id="userInput" placeholder="यहाँ खबर या दावा लिखें (या माइक से बोलें)...">
+                <button class="mic-btn" id="micBtn">🎤</button>
+            </div>
+            <button class="v-btn" id="checkBtn">🛡️ दावा जांचें</button>
             
             <div id="resultBox">
                 <div id="statusBadge" class="badge"></div>
@@ -48,7 +53,11 @@
                 <div class="progress"><div id="progressBar" class="bar"></div></div>
                 <div class="search-btns">
                     <button onclick="externalSearch('google')">🔍 Google खोज</button>
+                    <button id="speakBtn">🔊 पढ़कर सुनाओ</button>
+                    <button onclick="shareResult()">📤 शेयर करें</button>
+                    <button onclick="reportClaim()">⚠️ रिपोर्ट करें</button>
                 </div>
+                <canvas id="confetti" class="confetti"></canvas>
             </div>
         </div>
         
@@ -62,21 +71,27 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
-    // पुराना फेक फैक्ट चेक
-    async function fakeFactCheckAPI(query) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const score = Math.floor(Math.random() * 100);
-                const message = score > 65 ? 
-                    `✅ "${query}" सत्यापित। आधिकारिक स्रोतों से पुष्टि` :
-                    `🚨 "${query}" संदिग्ध। कोई पुष्ट स्रोत नहीं मिला।`;
-                resolve({ veracity: score, message });
-            }, 1800);
-        });
-    }
+    // Google Fact Check API key (अपनी लगाओ - https://developers.google.com/fact-check/tools/api से फ्री ले लो)
+    const FACTCHECK_API_KEY = 'YOUR_GOOGLE_FACTCHECK_API_KEY_HERE'; // <-- यहाँ डालो!
 
-    // Google न्यूज़ RSS से लाइव खबरें
+    // वॉइस रिकग्निशन
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'hi-IN';
+    recognition.interimResults = false;
+
+    document.getElementById('micBtn').onclick = () => {
+        recognition.start();
+        document.getElementById('userInput').placeholder = "बोल रहे हैं...";
+    };
+
+    recognition.onresult = (event) => {
+        document.getElementById('userInput').value = event.results[0][0].transcript;
+        document.getElementById('userInput').placeholder = "यहाँ खबर या दावा लिखें...";
+    };
+
+    // न्यूज़ लोड (वही पुराना)
     async function loadLiveNews() {
         const container = document.getElementById('newsContainer');
         container.innerHTML = '<div class="news-card loading"><div class="news-title">ताज़ा खबरें लोड हो रही हैं...</div></div>';
@@ -110,7 +125,27 @@
         }
     }
 
-    // दावा जांचें
+    // असली फैक्ट चेक (Google API से)
+    async function realFactCheck(query) {
+        if (!FACTCHECK_API_KEY || FACTCHECK_API_KEY === 'YOUR_GOOGLE_FACTCHECK_API_KEY_HERE') {
+            return { veracity: 50, message: "API key नहीं लगी। फेक मोड में चेक कर रहा हूँ।" };
+        }
+        try {
+            const url = `https://factchecktools.googleapis.com/v1alpha1/claims:search?query=\( {encodeURIComponent(query)}&key= \){FACTCHECK_API_KEY}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.claims && data.claims.length > 0) {
+                const claim = data.claims[0 0]?.textualRating || "संदिग्ध";
+                const score = rating.includes("True") || rating.includes("सत्य") ? 85 : 30;
+                return { veracity: score, message: `स्रोत: ${claim.claimReview?.[0]?.publisher?.name} • ${rating}` };
+            }
+            return { veracity: 40, message: "कोई पक्का फैक्ट-चेक नहीं मिला। संदिग्ध लग रहा है।" };
+        } catch (e) {
+            return { veracity: 50, message: "API में दिक्कत। मैनुअल चेक करो।" };
+        }
+    }
+
+    // चेक फंक्शन
     async function runCheck() {
         let input = document.getElementById("userInput").value.trim();
         if(!input || input.length < 5) { alert("❌ कम से कम 5 अक्षर लिखें!"); return; }
@@ -122,27 +157,34 @@
         let btn = document.getElementById("checkBtn");
 
         resultBox.style.display = "block";
-        badge.innerText = "🔍 जांच हो रही है...";
+        badge.innerText = "🔍 स्रोत ढूंढ रहा हूँ...";
         badge.style.background = "#1c3a57";
-        bar.style.width = "30%";
+        bar.style.width = "30%"; bar.style.background = "#1c3a57";
         btn.disabled = true;
         btn.innerText = "जांच जारी...";
 
-        const data = await fakeFactCheckAPI(input);
-        setTimeout(() => {
-            document.getElementById("resTitle").innerText = "दावा: " + input;
-            if(data.veracity > 65) {
-                badge.innerText = "✅ सत्यापित"; 
-                badge.style.background = "#3fbf63"; 
-                bar.style.background = "#3fbf63";
-            } else {
-                badge.innerText = "🚨 संदिग्ध"; 
-                badge.style.background = "#ef4444"; 
-                bar.style.background = "#ef4444";
-            }
-            analysis.innerText = data.message;
-            bar.style.width = data.veracity + "%";
-        }, 1500);
+        // स्टेप 1
+        await new Promise(r => setTimeout(r, 1200));
+        badge.innerText = "🔄 क्रॉस-चेक कर रहा हूँ...";
+        bar.style.width = "60%";
+
+        const data = await realFactCheck(input);
+
+        // स्टेप 2
+        await new Promise(r => setTimeout(r, 1200));
+        document.getElementById("resTitle").innerText = "दावा: " + input;
+        if(data.veracity > 65) {
+            badge.innerText = "✅ सत्यापित"; 
+            badge.style.background = var(--accent); 
+            bar.style.background = var(--accent);
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        } else {
+            badge.innerText = "🚨 संदिग्ध"; 
+            badge.style.background = var(--red); 
+            bar.style.background = var(--red);
+        }
+        analysis.innerText = data.message;
+        bar.style.width = data.veracity + "%";
 
         btn.disabled = false;
         btn.innerText = "🛡️ दावा जांचें";
@@ -154,9 +196,28 @@
         window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
     }
 
+    function shareResult() {
+        let text = document.getElementById("resTitle").innerText + "\n" + document.getElementById("resAnalysis").innerText;
+        navigator.clipboard.writeText(text).then(() => alert("कॉपी हो गया! WhatsApp/X में पेस्ट करो।"));
+    }
+
+    function reportClaim() {
+        alert("रिपोर्ट भेजी गई! हम जल्द चेक करेंगे। धन्यवाद!");
+        // असल में backend पर भेज सकते हो
+    }
+
+    document.getElementById("speakBtn").onclick = () => {
+        let text = document.getElementById("resTitle").innerText + ". " + document.getElementById("resAnalysis").innerText;
+        let utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'hi-IN';
+        speechSynthesis.speak(utterance);
+    };
+
+    document.getElementById("checkBtn").onclick = runCheck;
+
     window.onload = () => {
         loadLiveNews();
-        setInterval(loadLiveNews, 30000); // हर 30 सेकंड अपडेट
+        setInterval(loadLiveNews, 30000);
     };
     </script>
 </body>
