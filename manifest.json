@@ -1,24 +1,23 @@
 {
   "name": "SachCheck AI",
   "short_name": "SachCheck",
-  "description": "फेक न्यूज़ चेकर - AI से 2 सेकंड में सत्य जांच",
+  "description": "फेक न्यूज चेकर - AI से 2 सेकंड में सत्य जांच",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a1428",
   "theme_color": "#3fbf63",
   "icons": [
     {
-      
-"src": "/icon-192-new.png",
+      "src": "/icon-192-new.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     },
     {
       "src": "/icon-512-new.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }
