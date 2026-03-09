@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="#0a1428">
     <meta name="apple-mobile-web-app-title" content="SachCheck AI">
     <link rel="manifest" href="/manifest.json">
-    
+
     <style>
         :root {
             --bg: #0a1428;
@@ -75,20 +75,17 @@
             width: 100%; padding: 22px 20px; border-radius: 20px; 
             border: 3px dashed var(--accent); background: #0d1f33; 
             color: white; font-size: 18px; transition: all 0.3s;
-            font-family: inherit;
         }
         #userInput:focus {
             outline: none; border-color: #63d28c; box-shadow: 0 0 0 4px rgba(63,191,99,0.2);
             background: rgba(13,31,51,0.95);
         }
-        #userInput::placeholder { color: #94a3b8; opacity: 1; }
         
         .check-btn {
             width: 100%; padding: 22px; border: none; border-radius: 20px; 
             background: linear-gradient(135deg, var(--accent), #32c768); 
             color: white; font-weight: 800; font-size: 20px; cursor: pointer; 
             transition: all 0.3s; box-shadow: 0 10px 30px rgba(63,191,99,0.4);
-            font-family: inherit;
         }
         .check-btn:hover:not(:disabled) { 
             transform: translateY(-4px); box-shadow: 0 20px 40px rgba(63,191,99,0.5);
@@ -96,14 +93,12 @@
         .check-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         
         #progress { 
-            display: none; height: 12px; background: #0d1f33; 
-            border-radius: 8px; margin: 20px 0; overflow: hidden;
+            display: none; height: 12px; background: #0d1f33; border-radius: 8px; 
+            margin: 20px 0; overflow: hidden;
         }
         #progressBar { 
-            height: 100%; width: 0%; 
-            background: linear-gradient(90deg, var(--accent), #63d28c); 
-            transition: width 2.5s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 8px;
+            height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #63d28c); 
+            transition: width 2.5s ease; border-radius: 8px;
         }
         
         #resultBox { 
@@ -115,40 +110,23 @@
             display: inline-block; padding: 15px 25px; border-radius: 30px; 
             font-weight: 800; font-size: 18px; margin-bottom: 20px;
         }
-        .true { background: linear-gradient(135deg, #3fbf63, #32c768); box-shadow: 0 4px 15px rgba(63,191,99,0.4); }
-        .false { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 15px rgba(239,68,68,0.4); }
-        .unknown { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 15px rgba(245,158,11,0.4); }
-        
-        .result-source { margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 12px; }
-        .result-link { 
-            color: var(--accent); text-decoration: none; 
-            font-weight: 600; transition: all 0.2s;
-        }
-        .result-link:hover { text-decoration: underline; color: #63d28c; }
-        
-        .google-btn {
-            background: #6366f1; color: white; padding: 12px 20px; 
-            border-radius: 12px; text-decoration: none; display: inline-block;
-            margin-top: 10px; font-weight: 600; transition: all 0.2s;
-        }
-        .google-btn:hover { background: #5856eb; transform: translateY(-1px); }
+        .true { background: linear-gradient(135deg, #3fbf63, #32c768); }
+        .false { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .unknown { background: linear-gradient(135deg, #f59e0b, #d97706); }
         
         @media (max-width: 768px) {
             .container { padding: 20px 15px; }
             .card { padding: 30px 25px; }
-            .hero { height: 70vh; padding: 0 15px; }
         }
     </style>
 </head>
 <body>
-    <!-- PWA Install Banner -->
     <div class="install-banner" id="installBanner">
         <strong>📱 SachCheck AI को Home screen पर install करें!</strong>
         <button class="install-btn" id="installBtn">Install</button>
         <button class="install-btn" onclick="dismissInstall()" style="background:none;">❌</button>
     </div>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="logo">🛡️</div>
         <h1>Sach<span style="color: var(--accent);">Check</span> AI</h1>
@@ -162,7 +140,7 @@
         <div class="card">
             <h2 class="section-title">📝 दावा जांचें</h2>
             <div class="mega-input">
-                <input type="text" id="userInput" placeholder="उदाहरण: भारत में 100% फ्री बिजली मिल रही है..." maxlength="500">
+                <input type="text" id="userInput" placeholder="यहाँ खबर या दावा लिखें...">
             </div>
             <button class="check-btn" onclick="checkClaim()">🚀 अभी जांचें</button>
             
@@ -174,9 +152,8 @@
     </div>
 
     <script>
+        // PWA Install Prompt
         let deferredPrompt;
-
-        // PWA Install Handler
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -186,43 +163,91 @@
         document.getElementById('installBtn').onclick = async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+                await deferredPrompt.userChoice;
                 deferredPrompt = null;
                 document.getElementById('installBanner').classList.remove('show');
             }
         };
 
-        window.addEventListener('appinstalled', () => {
-            document.getElementById('installBanner').classList.remove('show');
-        });
-
         function dismissInstall() {
             document.getElementById('installBanner').classList.remove('show');
         }
 
-        // Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => 
-                    console.log('SW registration failed:', err)
-                );
+                navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
             });
         }
 
-        // 🔒 SECURE Fact Check - No Exposed API Key
+        // MAIN FUNCTION - Text-Only Fact Check
+        async function checkClaim() {
+            const text = document.getElementById('userInput').value.trim();
+            
+            if (!text) {
+                alert('कृपया दावा लिखें!');
+                return;
+            }
+
+            const progress = document.getElementById('progress');
+            const bar = document.getElementById('progressBar');
+            const btn = document.querySelector('.check-btn');
+            progress.style.display = 'block';
+            btn.disabled = true;
+            btn.textContent = 'जांच रहे हैं...';
+            bar.style.width = '0%';
+
+            let width = 0;
+            const interval = setInterval(() => {
+                width += 2;
+                bar.style.width = width + '%';
+                if (width >= 100) {
+                    clearInterval(interval);
+                    (async () => {
+                        const result = await realFactCheck(text);
+
+                        let badgeClass = 'unknown';
+                        let badgeText = '⚠️ अनिश्चित';
+                        let statusText = result.rating || 'कोई फैक्ट-चेक नहीं मिला';
+
+                        if (result.isTrue === true) {
+                            badgeClass = 'true';
+                            badgeText = '✅ सत्यापित';
+                        } else if (result.isTrue === false) {
+                            badgeClass = 'false';
+                            badgeText = '❌ फर्जी';
+                        }
+
+                        const resultBox = document.getElementById('resultBox');
+                        resultBox.innerHTML = `
+                            <div class="result-badge \( {badgeClass}"> \){badgeText}</div>
+                            <h3 style="color: var(--accent); margin: 15px 0;">परिणाम:</h3>
+                            <p style="font-size: 18px; margin-bottom: 15px;"><strong>"${text}"</strong></p>
+                            <p style="font-size: 17px;">${statusText}</p>
+                            \( {result.publisher ? `<p>स्रोत: <strong> \){result.publisher}</strong></p>` : ''}
+                            \( {result.urlLink ? `<a href=" \){result.urlLink}" target="_blank" style="color: var(--accent); text-decoration: underline;">पूर्ण रिपोर्ट पढ़ें →</a>` : ''}
+                            <div style="margin-top: 25px;">
+                                <a href="https://www.google.com/search?q=${encodeURIComponent(text + ' fact check hindi')}" target="_blank" 
+                                   style="background: #6366f1; color: white; padding: 12px 20px; border-radius: 12px; text-decoration: none; display: inline-block;">
+                                   Google पर और खोजें
+                                </a>
+                            </div>
+                        `;
+                        resultBox.style.display = 'block';
+
+                        progress.style.display = 'none';
+                        btn.disabled = false;
+                        btn.textContent = '🚀 अभी जांचें';
+                        
+                        resultBox.scrollIntoView({ behavior: 'smooth' });
+                    })();
+                }
+            }, 80);
+        }
+
+        // Google Fact Check Proxy (via /api/factcheck)
         async function realFactCheck(query) {
             try {
-                // Option 1: Backend proxy (Recommended for production)
-                // const response = await fetch(`/api/factcheck?query=${encodeURIComponent(query)}`);
-                
-                // Option 2: Restricted Google Fact Check API (Safe with referrer restrictions)
-                const apiKey = 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'; // Replace with YOUR RESTRICTED KEY
                 const response = await fetch(`/api/factcheck?query=${encodeURIComponent(query)}`);
-                const response = await fetch(url, {
-                    headers: {
-                        'Referer': window.location.origin
-                    }
-                });
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -233,136 +258,24 @@
                 if (data.claims && data.claims.length > 0) {
                     const claim = data.claims[0];
                     const review = claim.claimReview?.[0] || {};
-                    const rating = review.textualRating || 'No rating';
-                    const publisher = review.publisher?.name || 'Unknown source';
+                    const rating = review.textualRating || 'Unknown';
+                    const publisher = review.publisher?.name || 'Unknown';
                     const urlLink = review.url || '';
 
-                    // Improved rating detection
-                    const ratingLower = rating.toLowerCase();
                     let isTrue = null;
-                    
-                    if (ratingLower.includes('true') || ratingLower.includes('correct') || 
-                        ratingLower.includes('सत्य') || ratingLower.includes('सही')) {
+                    if (rating.toLowerCase().includes('true') || rating.includes('सही') || rating.includes('सत्य')) {
                         isTrue = true;
-                    } else if (ratingLower.includes('false') || ratingLower.includes('fake') || 
-                               ratingLower.includes('गलत') || ratingLower.includes('फर्जी') ||
-                               ratingLower.includes('misleading') || ratingLower.includes('partly false')) {
+                    } else if (rating.toLowerCase().includes('false') || rating.includes('गलत') || rating.includes('फर्जी')) {
                         isTrue = false;
                     }
 
                     return { isTrue, rating, publisher, urlLink };
                 }
-                
-                return { isTrue: null, rating: 'कोई आधिकारिक फैक्ट-चेक नहीं मिला' };
-                
+                return { isTrue: null, rating: 'कोई फैक्ट-चेक नहीं मिला' };
             } catch (err) {
-                console.warn('Fact check API unavailable:', err);
-                
-                // Smart fallback demo with realistic logic
-                const keywords = query.toLowerCase();
-                const trueIndicators = ['राष्ट्रपति', 'प्रधानमंत्री', 'चंद्रयान', 'गगनयान'];
-                const falseIndicators = ['फ्री बिजली सबको', 'चिप वैक्सीन', '2024 चुनाव हारे'];
-                
-                let isTrue = null;
-                if (trueIndicators.some(ind => keywords.includes(ind))) {
-                    isTrue = true;
-                } else if (falseIndicators.some(ind => keywords.includes(ind))) {
-                    isTrue = false;
-                }
-                
-                return { 
-                    isTrue, 
-                    rating: isTrue === null ? 
-                        '⚠️ API अस्थायी रूप से उपलब्ध नहीं। Google खोज से verify करें।' :
-                        (isTrue ? 'विश्वसनीय स्रोतों से सत्यापित' : 'कोई विश्वसनीय स्रोत नहीं मिला'),
-                    publisher: 'Smart Demo Mode'
-                };
+                console.error('Fact check API error:', err);
+                return { isTrue: null, rating: 'एरर: ' + err.message };
             }
-        }
-
-        // Main claim checking function
-        async function checkClaim() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-            
-            if (!text) {
-                alert('कृपया दावा लिखें!');
-                input.focus();
-                return;
-            }
-
-            if (text.length < 5) {
-                alert('कृपया कम से कम 5 अक्षर का दावा लिखें!');
-                return;
-            }
-
-            const progress = document.getElementById('progress');
-            const progressBar = document.getElementById('progressBar');
-            const btn = document.querySelector('.check-btn');
-            const resultBox = document.getElementById('resultBox');
-            
-            // UI State: Loading
-            progress.style.display = 'block';
-            btn.disabled = true;
-            btn.textContent = 'जांच रहे हैं...';
-            resultBox.style.display = 'none';
-            input.blur();
-            
-            // Reset progress
-            progressBar.style.width = '0%';
-            
-            // Simulate realistic progress (2.5 seconds)
-            setTimeout(async () => {
-                const result = await realFactCheck(text);
-
-                let badgeClass = 'unknown';
-                let badgeText = '⚠️ अनिश्चित';
-                
-                if (result.isTrue === true) {
-                    badgeClass = 'true';
-                    badgeText = '✅ सत्यापित';
-                } else if (result.isTrue === false) {
-                    badgeClass = 'false';
-                    badgeText = '❌ फर्जी';
-                }
-
-                // XSS Safe result display
-                const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                const safeRating = result.rating.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-                resultBox.innerHTML = `
-                    <div class="result-badge ${badgeClass}">${badgeText}</div>
-                    <h3 style="color: var(--accent); margin: 15px 0 10px 0;">परिणाम:</h3>
-                    <p style="font-size: 18px; margin-bottom: 15px; font-weight: 500;">
-                        "${safeText}"
-                    </p>
-                    <div class="result-source">
-                        <p style="font-size: 17px; margin-bottom: 8px;">${safeRating}</p>
-                        ${result.publisher ? `<p style="font-size: 15px; opacity: 0.9; margin: 0;">स्रोत: <strong>${result.publisher}</strong></p>` : ''}
-                    </div>
-                    ${result.urlLink ? `
-                        <a href="${result.urlLink}" target="_blank" class="result-link" rel="noopener">
-                            📄 पूर्ण रिपोर्ट पढ़ें →
-                        </a>
-                    ` : ''}
-                    <div style="margin-top: 25px;">
-                        <a href="https://www.google.com/search?q=${encodeURIComponent(text + ' fact check hindi')}" 
-                           target="_blank" class="google-btn" rel="noopener">
-                           🔍 Google पर और खोजें
-                        </a>
-                    </div>
-                `;
-                resultBox.style.display = 'block';
-
-                // Reset UI
-                progress.style.display = 'none';
-                btn.disabled = false;
-                btn.textContent = '🚀 अभी जांचें';
-                
-                // Scroll to result
-                resultBox.scrollIntoView({ behavior: 'smooth' });
-                
-            }, 2500);
         }
 
         // Enter key support
