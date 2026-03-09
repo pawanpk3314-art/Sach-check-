@@ -217,8 +217,7 @@
                 
                 // Option 2: Restricted Google Fact Check API (Safe with referrer restrictions)
                 const apiKey = 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'; // Replace with YOUR RESTRICTED KEY
-                const url = `https://factchecktools.googleapis.com/v1alpha1/claims:search?query=${encodeURIComponent(query)}&key=${apiKey}&languageCode=hi&maxResults=5`;
-                
+                const response = await fetch(`/api/factcheck?query=${encodeURIComponent(query)}`);
                 const response = await fetch(url, {
                     headers: {
                         'Referer': window.location.origin
